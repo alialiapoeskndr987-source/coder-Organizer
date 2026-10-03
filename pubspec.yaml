@@ -1,0 +1,40 @@
+name: coder_organizer
+description: "Coder Organizer — organize programmers' work: projects, clients, subscriptions, publishing platforms, registered emails, variables, links, notes and alerts."
+publish_to: 'none'
+version: 1.22.0+22
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  flutter_riverpod: ^2.6.1
+  drift: ^2.28.1
+  sqlite3_flutter_libs: ^0.5.32
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.10.1
+  in_app_purchase: ^3.2.3
+  firebase_core: ^3.15.2
+  firebase_analytics: ^11.6.0
+  firebase_auth: ^5.7.0
+  google_sign_in: ^6.3.0
+  flutter_secure_storage: ^9.2.4
+  file_picker: ^10.2.1
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.28.2
+  build_runner: ^2.4.15
+
+flutter:
+  uses-material-design: true
+  generate: true
