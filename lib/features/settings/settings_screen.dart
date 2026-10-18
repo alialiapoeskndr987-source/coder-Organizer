@@ -113,6 +113,46 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
 
+          SectionHeader(title: l10n.organizationSection),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: DropdownButtonFormField<NodeSort>(
+              // v1.23 — default ordering for tree browser & search.
+              initialValue: ref.watch(nodeSortProvider),
+              isExpanded: true,
+              decoration: InputDecoration(labelText: l10n.defaultSort),
+              items: [
+                DropdownMenuItem(
+                    value: NodeSort.manual, child: Text(l10n.sortManual)),
+                DropdownMenuItem(
+                    value: NodeSort.nameAZ, child: Text(l10n.sortNameAZ)),
+                DropdownMenuItem(
+                    value: NodeSort.newest, child: Text(l10n.sortNewest)),
+                DropdownMenuItem(
+                    value: NodeSort.oldest, child: Text(l10n.sortOldest)),
+              ],
+              onChanged: (v) {
+                if (v != null) {
+                  ref.read(nodeSortProvider.notifier).setSort(v);
+                }
+              },
+            ),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.insights_outlined),
+            title: Text(l10n.showStats),
+            value: ref.watch(homePrefsProvider).showStats,
+            onChanged: (v) =>
+                ref.read(homePrefsProvider.notifier).setShowStats(v),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.grid_view_outlined),
+            title: Text(l10n.compactGrid),
+            value: ref.watch(homePrefsProvider).compactGrid,
+            onChanged: (v) =>
+                ref.read(homePrefsProvider.notifier).setCompactGrid(v),
+          ),
+
           SectionHeader(title: l10n.dataSection),
           ListTile(
             leading: const Icon(Icons.ios_share),

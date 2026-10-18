@@ -16,3 +16,6 @@ enum ImportStrategy { replace, merge }
 enum TrialStatus { active, expired }
 
 enum PurchaseState { unknown, purchased, notPurchased, pending }
+
+/// v1.23 — user-selectable ordering for tree browser & search results.
+enum NodeSort { manual, nameAZ, newest, oldest }

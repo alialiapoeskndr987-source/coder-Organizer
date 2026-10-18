@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/models/enums.dart';
 import '../core/theme/app_theme.dart';
 import 'core_providers.dart';
 import '../data/db/app_database.dart';
@@ -76,6 +77,73 @@ class MainTitleController extends StateNotifier<String> {
 final mainTitleProvider =
     StateNotifierProvider<MainTitleController, String>((ref) {
   final c = MainTitleController(ref.watch(appDatabaseProvider));
+  ref.onDispose(() {});
+  return c;
+});
+
+// ── Node sort (v1.23): tree browser + search results, persisted ─────
+class NodeSortController extends StateNotifier<NodeSort> {
+  final AppDatabase _db;
+  NodeSortController(this._db) : super(NodeSort.manual) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final v = await _db.getSetting('node_sort');
+    final idx = int.tryParse(v ?? '') ?? 0;
+    state =
+        NodeSort.values[idx.clamp(0, NodeSort.values.length - 1)];
+  }
+
+  Future<void> setSort(NodeSort s) async {
+    state = s;
+    await _db.setSetting('node_sort', '${s.index}');
+  }
+}
+
+final nodeSortProvider =
+    StateNotifierProvider<NodeSortController, NodeSort>((ref) {
+  final c = NodeSortController(ref.watch(appDatabaseProvider));
+  ref.onDispose(() {});
+  return c;
+});
+
+// ── Home display preferences (v1.23): stats + grid density ──────────
+class HomePrefs {
+  final bool showStats;
+  final bool compactGrid;
+  const HomePrefs({this.showStats = true, this.compactGrid = false});
+}
+
+class HomePrefsController extends StateNotifier<HomePrefs> {
+  final AppDatabase _db;
+  HomePrefsController(this._db) : super(const HomePrefs()) {
+    _load();
+  }
+
+  Future<void> _load() async {
+    final stats = await _db.getSetting('show_stats');
+    final compact = await _db.getSetting('compact_grid');
+    state = HomePrefs(
+      showStats: stats != '0',
+      compactGrid: compact == '1',
+    );
+  }
+
+  Future<void> setShowStats(bool v) async {
+    state = HomePrefs(showStats: v, compactGrid: state.compactGrid);
+    await _db.setSetting('show_stats', v ? '1' : '0');
+  }
+
+  Future<void> setCompactGrid(bool v) async {
+    state = HomePrefs(showStats: state.showStats, compactGrid: v);
+    await _db.setSetting('compact_grid', v ? '1' : '0');
+  }
+}
+
+final homePrefsProvider =
+    StateNotifierProvider<HomePrefsController, HomePrefs>((ref) {
+  final c = HomePrefsController(ref.watch(appDatabaseProvider));
   ref.onDispose(() {});
   return c;
 });

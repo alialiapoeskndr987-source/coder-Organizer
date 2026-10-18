@@ -95,6 +95,27 @@ class TreeState {
   }
 }
 
+/// v1.23 — order a node list by the user's preferred sort (FR-03/04).
+/// [NodeSort.manual] keeps the custom sortIndex ordering.
+List<Node> sortNodes(List<Node> list, NodeSort sort) {
+  final out = List<Node>.of(list);
+  switch (sort) {
+    case NodeSort.manual:
+      out.sort((a, b) {
+        final c = a.sortIndex.compareTo(b.sortIndex);
+        return c != 0 ? c : a.id.compareTo(b.id);
+      });
+    case NodeSort.nameAZ:
+      out.sort((a, b) =>
+          a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    case NodeSort.newest:
+      out.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    case NodeSort.oldest:
+      out.sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  }
+  return out;
+}
+
 final treeProvider = StreamProvider<TreeState>((ref) {
   final db = ref.watch(appDatabaseProvider);
   return db.nodesDao.watchNodes().asyncMap((nodes) async {

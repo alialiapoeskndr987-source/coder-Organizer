@@ -199,5 +199,19 @@
   "theme5": "قرمزي الليل",
   "theme6": "سماوي المحيط",
   "theme7": "فضي المعدن",
-  "theme8": "ذهبي منتصف الليل"
+  "theme8": "ذهبي منتصف الليل",
+  "sortBy": "ترتيب حسب",
+  "sortManual": "الترتيب المخصص",
+  "sortNameAZ": "الاسم (أ–ي)",
+  "sortNewest": "الأحدث أولاً",
+  "sortOldest": "الأقدم أولاً",
+  "overview": "نظرة عامة",
+  "statTabs": "تبويبات",
+  "statSubTabs": "تبويبات فرعية",
+  "statSections": "أقسام",
+  "statProjects": "مشاريع",
+  "organizationSection": "التنظيم والعرض",
+  "defaultSort": "الترتيب الافتراضي",
+  "showStats": "إظهار الإحصاءات في الرئيسية",
+  "compactGrid": "شبكة مضغوطة"
 }

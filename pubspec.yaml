@@ -1,7 +1,7 @@
 name: coder_organizer
 description: "Coder Organizer — organize programmers' work: projects, clients, subscriptions, publishing platforms, registered emails, variables, links, notes and alerts."
 publish_to: 'none'
-version: 1.22.0+22
+version: 1.23.0+23
 
 environment:
   sdk: ^3.7.0

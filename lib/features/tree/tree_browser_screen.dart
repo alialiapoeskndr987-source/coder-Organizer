@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/enums.dart';
 import '../../data/db/app_database.dart';
+import '../../providers/settings_providers.dart';
 import '../../providers/tree_providers.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/icon_registry.dart';
@@ -22,6 +23,9 @@ class TreeBrowserScreen extends ConsumerStatefulWidget {
 }
 
 class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
+  /// v1.23 — status filter for children (null = show all).
+  NodeStatus? _statusFilter;
+
   @override
   void initState() {
     super.initState();
@@ -144,6 +148,62 @@ class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
     }
   }
 
+  /// v1.23 — sort menu (persisted, shared with search & settings).
+  Widget _sortMenu(AppLocalizations l10n, NodeSort sort) =>
+      PopupMenuButton<NodeSort>(
+        icon: const Icon(Icons.sort),
+        tooltip: l10n.sortBy,
+        onSelected: (s) =>
+            ref.read(nodeSortProvider.notifier).setSort(s),
+        itemBuilder: (ctx) => [
+          CheckedPopupMenuItem(
+              value: NodeSort.manual,
+              checked: sort == NodeSort.manual,
+              child: Text(l10n.sortManual)),
+          CheckedPopupMenuItem(
+              value: NodeSort.nameAZ,
+              checked: sort == NodeSort.nameAZ,
+              child: Text(l10n.sortNameAZ)),
+          CheckedPopupMenuItem(
+              value: NodeSort.newest,
+              checked: sort == NodeSort.newest,
+              child: Text(l10n.sortNewest)),
+          CheckedPopupMenuItem(
+              value: NodeSort.oldest,
+              checked: sort == NodeSort.oldest,
+              child: Text(l10n.sortOldest)),
+        ],
+      );
+
+  /// v1.23 — status filter chips (all / active / archived).
+  Widget _statusChips(AppLocalizations l10n) => Padding(
+        padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
+        child: Row(children: [
+          FilterChip(
+            selected: _statusFilter == null,
+            showCheckmark: false,
+            label: Text(l10n.allOption),
+            onSelected: (_) => setState(() => _statusFilter = null),
+          ),
+          const SizedBox(width: 8),
+          FilterChip(
+            selected: _statusFilter == NodeStatus.active,
+            showCheckmark: false,
+            label: Text(l10n.statusActive),
+            onSelected: (_) =>
+                setState(() => _statusFilter = NodeStatus.active),
+          ),
+          const SizedBox(width: 8),
+          FilterChip(
+            selected: _statusFilter == NodeStatus.archived,
+            showCheckmark: false,
+            label: Text(l10n.statusArchived),
+            onSelected: (_) =>
+                setState(() => _statusFilter = NodeStatus.archived),
+          ),
+        ]),
+      );
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -165,7 +225,13 @@ class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
             body: EmptyState(icon: Icons.search_off, message: l10n.noResults),
           );
         }
-        final children = tree.childrenOf(node.id);
+        final sort = ref.watch(nodeSortProvider);
+        var children = tree.childrenOf(node.id);
+        if (_statusFilter != null) {
+          children =
+              children.where((c) => c.status == _statusFilter).toList();
+        }
+        children = sortNodes(children, sort);
         final breadcrumb = tree.breadcrumbOf(node.id);
         final childType = _expectedChildType;
 
@@ -173,6 +239,7 @@ class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
           appBar: AppBar(
             title: Text(node.name),
             actions: [
+              _sortMenu(l10n, sort),
               PopupMenuButton<String>(
                 onSelected: (v) => switch (v) {
                   'rename' => _rename(node),
@@ -234,31 +301,41 @@ class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
                   icon: const Icon(Icons.add),
                   label: Text(nodeTypeLabel(l10n, childType)),
                 ),
-          body: children.isEmpty
-              ? EmptyState(
-                  icon: Icons.category_outlined,
-                  message: l10n.emptyState)
-              : ListView.separated(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: children.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 6),
-                  itemBuilder: (context, i) {
-                    final c = children[i];
-                    return Card(
-                      child: ListTile(
-                        leading: Icon(iconFor(c.icon),
-                            color: theme.colorScheme.primary),
-                        title: Text(c.name,
-                            maxLines: 1, overflow: TextOverflow.ellipsis),
-                        subtitle: c.status == NodeStatus.archived
-                            ? Text(l10n.statusArchived)
-                            : Text(nodeTypeLabel(l10n, c.type)),
-                        trailing: const Icon(Icons.chevron_right, size: 20),
-                        onTap: () => _openChild(c),
+          body: Column(
+            children: [
+              _statusChips(l10n),
+              Expanded(
+                child: children.isEmpty
+                    ? EmptyState(
+                        icon: Icons.category_outlined,
+                        message: l10n.emptyState)
+                    : ListView.separated(
+                        padding: const EdgeInsets.all(12),
+                        itemCount: children.length,
+                        separatorBuilder: (_, __) =>
+                            const SizedBox(height: 6),
+                        itemBuilder: (context, i) {
+                          final c = children[i];
+                          return Card(
+                            child: ListTile(
+                              leading: Icon(iconFor(c.icon),
+                                  color: theme.colorScheme.primary),
+                              title: Text(c.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                              subtitle: c.status == NodeStatus.archived
+                                  ? Text(l10n.statusArchived)
+                                  : Text(nodeTypeLabel(l10n, c.type)),
+                              trailing:
+                                  const Icon(Icons.chevron_right, size: 20),
+                              onTap: () => _openChild(c),
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
+              ),
+            ],
+          ),
         );
       },
     );

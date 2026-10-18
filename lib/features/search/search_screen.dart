@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/enums.dart';
 import '../../data/db/app_database.dart';
+import '../../providers/settings_providers.dart';
 import '../../providers/tree_providers.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/icon_registry.dart';
@@ -28,6 +29,33 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   NodeType? _type;
   NodeStatus? _status;
 
+  /// v1.23 — sort menu for results (persisted, shared with browser).
+  Widget _sortMenu(AppLocalizations l10n, NodeSort sort) =>
+      PopupMenuButton<NodeSort>(
+        icon: const Icon(Icons.sort),
+        tooltip: l10n.sortBy,
+        onSelected: (s) =>
+            ref.read(nodeSortProvider.notifier).setSort(s),
+        itemBuilder: (ctx) => [
+          CheckedPopupMenuItem(
+              value: NodeSort.manual,
+              checked: sort == NodeSort.manual,
+              child: Text(l10n.sortManual)),
+          CheckedPopupMenuItem(
+              value: NodeSort.nameAZ,
+              checked: sort == NodeSort.nameAZ,
+              child: Text(l10n.sortNameAZ)),
+          CheckedPopupMenuItem(
+              value: NodeSort.newest,
+              checked: sort == NodeSort.newest,
+              child: Text(l10n.sortNewest)),
+          CheckedPopupMenuItem(
+              value: NodeSort.oldest,
+              checked: sort == NodeSort.oldest,
+              child: Text(l10n.sortOldest)),
+        ],
+      );
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -39,13 +67,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final subs = tree.nodes.where((n) => n.parentId == _tabId).toList();
     final sections = tree.nodes.where((n) => n.parentId == _subId).toList();
 
-    final results = tree.search(
-      query: _query,
-      tabId: _tabId,
-      subId: _subId,
-      sectionId: _sectionId,
-      type: _type,
-      status: _status,
+    final sort = ref.watch(nodeSortProvider);
+    final results = sortNodes(
+      tree.search(
+        query: _query,
+        tabId: _tabId,
+        subId: _subId,
+        sectionId: _sectionId,
+        type: _type,
+        status: _status,
+      ),
+      sort,
     );
 
     Widget parentDropdown({
@@ -80,7 +112,10 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         );
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.search)),
+      appBar: AppBar(
+        title: Text(l10n.search),
+        actions: [_sortMenu(l10n, sort)],
+      ),
       body: Column(
         children: [
           Padding(

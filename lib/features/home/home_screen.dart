@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:coder_organizer/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/models/enums.dart';
 import '../../data/db/app_database.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/settings_providers.dart';
@@ -34,6 +35,7 @@ class HomeScreen extends ConsumerWidget {
     final treeAsync = ref.watch(treeProvider);
     final mainTitle = ref.watch(mainTitleProvider);
     final trial = ref.watch(trialProvider).value;
+    final prefs = ref.watch(homePrefsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -72,6 +74,15 @@ class HomeScreen extends ConsumerWidget {
           final roots = tree.rootTabs;
           final byId = {for (final n in tree.nodes) n.id: n};
 
+          // v1.23 — workspace overview stats (toggleable in settings).
+          final subTabsCount =
+              tree.nodes.where((n) => n.type == NodeType.subTab).length;
+          final sectionsCount =
+              tree.nodes.where((n) => n.type == NodeType.section).length;
+          final projectsCount =
+              tree.nodes.where((n) => n.type == NodeType.project).length;
+
+
           final mostVisited = (tree.visitCounts.entries.toList()
                 ..sort((a, b) => b.value.compareTo(a.value)))
               .where((e) => byId.containsKey(e.key))
@@ -87,6 +98,34 @@ class HomeScreen extends ConsumerWidget {
             padding: const EdgeInsets.only(bottom: 96),
             children: [
               if (trial != null && !trial.purchased) _TrialBanner(daysLeft: trial.daysLeft),
+              if (prefs.showStats) ...[
+                SectionHeader(title: l10n.overview),
+                SizedBox(
+                  height: 92,
+                  child: ListView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    children: [
+                      _StatCard(
+                          icon: Icons.tab_outlined,
+                          label: l10n.statTabs,
+                          value: roots.length),
+                      _StatCard(
+                          icon: Icons.account_tree_outlined,
+                          label: l10n.statSubTabs,
+                          value: subTabsCount),
+                      _StatCard(
+                          icon: Icons.folder_special_outlined,
+                          label: l10n.statSections,
+                          value: sectionsCount),
+                      _StatCard(
+                          icon: Icons.work_outline,
+                          label: l10n.statProjects,
+                          value: projectsCount),
+                    ],
+                  ),
+                ),
+              ],
               if (mostVisited.isNotEmpty) ...[
                 SectionHeader(title: l10n.mostVisited),
                 SizedBox(
@@ -144,11 +183,12 @@ class HomeScreen extends ConsumerWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 220,
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    // v1.23 — grid density follows the compact preference.
+                    maxCrossAxisExtent: prefs.compactGrid ? 150 : 220,
                     mainAxisSpacing: 10,
                     crossAxisSpacing: 10,
-                    childAspectRatio: 1.55,
+                    childAspectRatio: prefs.compactGrid ? 1.3 : 1.55,
                   ),
                   itemCount: roots.length,
                   itemBuilder: (context, i) {
@@ -256,6 +296,52 @@ class _TabCard extends StatelessWidget {
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// v1.23 — compact overview stat card shown on the home screen.
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final int value;
+  const _StatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      child: Container(
+        width: 128,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(children: [
+              Icon(icon, size: 18, color: theme.colorScheme.primary),
+              const Spacer(),
+              Text(
+                '$value',
+                style: theme.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.w800),
+              ),
+            ]),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+          ],
         ),
       ),
     );

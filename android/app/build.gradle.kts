@@ -29,8 +29,8 @@ android {
         // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
         // You can force using the value of versionCode by specifying the `-P force-version-code-ignoring-abi=true`
         // flag during build.
-        versionCode = 22 // D-020: v1.22
-        versionName = "1.22" // D-020: v1.22
+        versionCode = 23 // v1.23
+        versionName = "1.23" // v1.23
     }
 
     buildTypes {
@@ -38,6 +38,29 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+        }
+    }
+
+    // v1.23 — نسختا توزيع:
+    // stable = الهوية الرسمية (com.coderorganizer) بشمول كل المعماريات.
+    // lite   = حزمة مستقلة (.lite) لتفادي أي تعارض تثبيت سابق + وضع تغليف
+    //          قديم (extractNativeLibs=true) لأقصى توافق مع ROMs المصنّعين.
+    flavorDimensions += "channel"
+    productFlavors {
+        create("stable") {
+            dimension = "channel"
+            resValue("string", "app_name", "Coder Organizer")
+        }
+        create("lite") {
+            dimension = "channel"
+            applicationIdSuffix = ".lite"
+            versionNameSuffix = "-lite"
+            resValue("string", "app_name", "Coder Organizer Lite")
+            packaging {
+                jniLibs {
+                    useLegacyPackaging = true
+                }
+            }
         }
     }
 }
