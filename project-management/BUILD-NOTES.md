@@ -115,3 +115,27 @@ keytool -genkey -v -keystore ~/coder-organizer-upload.jks -keyalg RSA -keysize 2
 - المخرجات تُرفع كـ artifact باسم `coder-organizer-apks` يحوي: `coder-organizer-v1.22-release.apk` (شامل) + `coder-organizer-v1.22-arm64.apk` + `SHA256SUMS.txt`
 
 **توقيع APK المبني في CI:** توقيع debug (سلوك قالب Flutter الافتراضي) — يكفي للتثبيت التجريبي المباشر على الجهاز؛ يُعاد التوقيع بمفتاح النشر قبل رفع App Bundle إلى Play (§6).
+
+## 9. نسختا التوزيع v1.23 (flavors) — معالجة فشل التثبيت + حلول أندرويد 12
+
+**السبب المرجّح لفشل تثبيت v1.22 فوراً وبلا رسالة:** تحميل ناقص/تالف عبر شبكة متذبذبة، أو تعارض حزمة سابقة، أو رفض صامت من Play Protect. عولج ببناء نسختين مختلفتين معماريّاً:
+
+| | Lite (ابدأ بها) | Full Universal |
+|---|---|---|
+| الملف | coder-organizer-v1.23-lite-arm64.apk (~12 MB) | coder-organizer-v1.23-full-universal.apk (~31 MB) |
+| الحزمة | `com.coderorganizer.lite` (مستقلة — لا تعارض مع تثبيت سابق) | `com.coderorganizer` (الرسمية D-020) |
+| اسم الظهور | Coder Organizer Lite | Coder Organizer |
+| المعماريات | arm64-v8a فقط | arm64-v8a + armeabi-v7a + x86_64 |
+| التغليف | useLegacyPackaging=true (extractNativeLibs — أقصى توافق ROMs) | حديث (مكتبات غير مضغوطة) |
+
+**تقنياً:** النكهات في `android/app/build.gradle.kts` (flavorDimension «channel»)؛ اسم الظهور عبر `manifestPlaceholders["appName"]` والمانيفست `${appName}` (resValue يتطلب buildFeatures.resValues — معطلة افتراضياً في AGP الحديث). بناء Lite: `flutter build apk --release --flavor lite --split-per-abi --target-platform android-arm64` (نمط المخرجات: `app-ABI-flavor-release.apk`).
+
+**قائمة فحص التثبيت على أندرويد 12 (ترسل مع كل إصدار):**
+1. تحقق من حجم الملف بعد التحميل (ناقص = تالف → أعد عبر Wi-Fi)
+2. احذف أي محاولة تثبيت سابقة (الإعدادات ← التطبيقات)
+3. امنح «تثبيت تطبيقات غير معروفة» لمدير الملفات المستخدم
+4. ثبّت من مدير الملفات بعد فك ضغط ZIP كاملاً — لا من داخل المعاينة
+5. إن استمر الفشل: Play Protect ← سجل الفحص (قد يمنع بصمت) + تأكد من 500MB حرة
+6. إن فشلت Lite: جرّب Full Universal (حزمة مختلفة تماماً) وأبلغ برسالة الخطأ الحرفية
+
+**جديد v1.23 (طلب المالك):** فرز مستدام (يدوي/اسم/أحدث/أقدم) للاستعراض والبحث، فلترة حالة في الشجرة، إحصاءات نظرة عامة في الرئيسية، شبكة مضغوطة اختيارية، قسم التنظيم والعرض بالإعدادات — بلا تغيير مخطط قاعدة (settings KV فقط).
