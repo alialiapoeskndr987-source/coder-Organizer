@@ -6,6 +6,7 @@ on:
     # لا بناء للدفعات التوثيقية أو تحديثات مجلد apk
     paths-ignore:
       - 'apk/**'
+      - 'branding/**'
       - 'project-management/**'
       - '**.md'
   workflow_dispatch:

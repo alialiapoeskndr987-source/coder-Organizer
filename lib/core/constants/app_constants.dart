@@ -6,7 +6,7 @@ class AppConstants {
   // ── Identity (D-020) ─────────────────────────────────────────────
   static const String appName = 'coder-organizer';
   static const String appDisplayName = 'Coder Organizer';
-  static const String appVersion = '1.23';
+  static const String appVersion = '1.24';
   static const String applicationId = 'com.coderorganizer';
 
   // ── Monetization (D-014, D-018) ──────────────────────────────────

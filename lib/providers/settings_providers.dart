@@ -6,10 +6,13 @@ import '../core/theme/app_theme.dart';
 import 'core_providers.dart';
 import '../data/db/app_database.dart';
 
-// ── Theme (FR-02 / D-008) — instant apply + persistence ──────────────
+// ── Theme (FR-02 / D-008) — instant apply + persistence ─────────────
+// `initial` is preloaded in main() so the first frame already carries the
+// saved theme (no flash of the default on slow storage).
 class ThemeController extends StateNotifier<AppTheme> {
   final AppDatabase _db;
-  ThemeController(this._db) : super(AppTheme.programmerBlue) {
+  ThemeController(this._db, [AppTheme? initial])
+      : super(initial ?? AppTheme.programmerBlue) {
     _load();
   }
 
@@ -33,10 +36,15 @@ final themeProvider =
   return c;
 });
 
-// ── Locale (NFR-06 / D-012): null = system default (English) ─────────
+// ── Locale (NFR-06 / D-012) ─────────────────────────────────────────────
+// null = follow the DEVICE language (standard behavior): with no explicit
+// choice saved, MaterialApp resolves the system locale, so an Arabic phone
+// gets Arabic on first launch. Once the user picks a language it is saved
+// and `initial` (preloaded in main()) applies it from the very first frame
+// — no system-language flash on subsequent starts.
 class LocaleController extends StateNotifier<Locale?> {
   final AppDatabase _db;
-  LocaleController(this._db) : super(null) {
+  LocaleController(this._db, [Locale? initial]) : super(initial) {
     _load();
   }
 
