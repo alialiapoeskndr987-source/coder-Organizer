@@ -4,6 +4,7 @@ import 'package:coder_organizer/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/db/app_database.dart';
+import '../../providers/profile_providers.dart';
 import '../profiles/profiles_screen.dart';
 
 /// v2.0 (D-021) — quick profile switcher for the Home app bar and the

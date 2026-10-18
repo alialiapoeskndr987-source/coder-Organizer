@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/constants/app_constants.dart';
 import '../data/db/app_database.dart';
+import 'core_providers.dart';
 
 // ── v2.0 structural undo (D-025): last ~10 operations, in-memory ────────
 

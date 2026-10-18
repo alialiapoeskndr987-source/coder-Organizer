@@ -130,7 +130,9 @@ class _ProfilesScreenState extends ConsumerState<ProfilesScreen> {
   Future<void> _restoreProfile(Profile p) async {
     await ref.read(profileActionsProvider).restore(p.id);
     await _reloadTrash();
-    if (mounted) showError(context, l10n.profileRestored);
+    if (mounted) {
+      showError(context, AppLocalizations.of(context)!.profileRestored);
+    }
   }
 
   Future<void> _deleteForever(Profile p) async {

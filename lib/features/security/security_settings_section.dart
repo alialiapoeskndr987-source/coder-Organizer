@@ -6,6 +6,7 @@ import '../../core/constants/app_constants.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/security_providers.dart';
 import '../paywall/paywall_screen.dart';
+import 'totp_setup_screen.dart';
 
 /// v2.0 — password confirmation for sensitive actions (D-028: export,
 /// import, permanent deletes, security changes). Returns true when the

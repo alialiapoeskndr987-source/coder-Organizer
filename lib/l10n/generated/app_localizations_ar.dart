@@ -880,4 +880,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String categoryNumber(int n) {
   return 'تصنيف $n';
   }
+
+  @override
+  String get disableAntiTheft => 'تعطيل مكافحة السرقة';
 }

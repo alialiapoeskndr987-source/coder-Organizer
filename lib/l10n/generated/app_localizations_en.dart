@@ -884,4 +884,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String categoryNumber(int n) {
   return 'Category $n';
   }
+
+  @override
+  String get disableAntiTheft => 'Disable anti-theft';
 }

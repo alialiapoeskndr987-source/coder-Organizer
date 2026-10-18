@@ -11,6 +11,7 @@ import '../../providers/profile_providers.dart';
 import '../../providers/settings_providers.dart';
 import '../../shared/widgets/common.dart';
 import '../paywall/paywall_screen.dart';
+import '../profiles/profiles_screen.dart';
 import '../security/security_settings_section.dart';
 import '../trash/trash_screen.dart';
 

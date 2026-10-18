@@ -39,10 +39,6 @@ final trashedProfilesProvider = FutureProvider<List<Profile>>((ref) async {
   return ref.watch(appDatabaseProvider).trashedProfiles();
 });
 
-/// Whether the current entitlement allows `n` profiles (D-026).
-bool profilesLimitOf({required bool isPro}) =>
-    isPro ? 10 : 1;
-
 class ProfileActions {
   final Ref _ref;
   ProfileActions(this._ref);

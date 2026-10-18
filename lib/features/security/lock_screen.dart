@@ -155,7 +155,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                       const SizedBox(height: 10),
                       TextButton.icon(
                         onPressed: _useRecoveryCode,
-                        icon: const Icon(Icons.recovery_times_outlined, size: 18),
+                        icon: const Icon(Icons.remember_me_outlined, size: 18),
                         label: Text(l10n.useRecoveryCode),
                       ),
                       if (state.failedAttempts > 0)

@@ -5,10 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/db/app_database.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/profile_providers.dart';
-import '../../providers/security_providers.dart';
 import '../../providers/tree_providers.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/icon_registry.dart';
+import '../security/security_settings_section.dart';
 import '../tree/tree_browser_screen.dart';
 
 /// Trash (D-010, D-024): 30-day retention, restore, permanent delete,

@@ -406,5 +406,6 @@
   "undoLast": "Undo last change",
   "undoDone": "Undone",
   "nothingToUndo": "Nothing to undo",
+  "disableAntiTheft": "Disable anti-theft",
   "openTree": "Open tree"
 }

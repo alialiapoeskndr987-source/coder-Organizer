@@ -305,5 +305,6 @@
   "undoLast": "تراجع عن آخر تغيير",
   "undoDone": "تم التراجع",
   "nothingToUndo": "لا يوجد ما يمكن التراجع عنه",
+  "disableAntiTheft": "تعطيل مكافحة السرقة",
   "openTree": "فتح الشجرة"
 }
