@@ -8,6 +8,7 @@ import '../../core/models/enums.dart';
 import '../../data/db/app_database.dart';
 import '../../providers/settings_providers.dart';
 import '../../providers/tree_providers.dart';
+import '../../providers/undo_providers.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/icon_registry.dart';
 import '../create/create_assistant_screen.dart';
@@ -36,11 +37,14 @@ class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
   NodeType? get _expectedChildType {
     final node = _node;
     if (node == null) return null;
+    // v2.0 (D-022/D-027) — the 3-level chain is optional and projects/items
+    // grow a FREE tree: any project or item accepts item children.
     return switch (node.type) {
       NodeType.mainTab => NodeType.subTab,
       NodeType.subTab => NodeType.section,
       NodeType.section => NodeType.project,
-      NodeType.project => null,
+      NodeType.project => NodeType.item,
+      NodeType.item => NodeType.item,
     };
   }
 
@@ -148,6 +152,14 @@ class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
     }
   }
 
+  /// v2.0 (D-025) — undo the most recent structural change.
+  Future<void> _undo() async {
+    final l10n = AppLocalizations.of(context)!;
+    final ok = await ref.read(undoProvider.notifier).undo();
+    if (!mounted) return;
+    showError(context, ok ? l10n.undoDone : l10n.nothingToUndo);
+  }
+
   /// v1.23 — sort menu (persisted, shared with search & settings).
   Widget _sortMenu(AppLocalizations l10n, NodeSort sort) =>
       PopupMenuButton<NodeSort>(
@@ -239,6 +251,13 @@ class _TreeBrowserScreenState extends ConsumerState<TreeBrowserScreen> {
           appBar: AppBar(
             title: Text(node.name),
             actions: [
+              // v2.0 (D-025) — global structural undo (last ~10 ops).
+              IconButton(
+                tooltip: l10n.undoLast,
+                icon: const Icon(Icons.undo),
+                onPressed:
+                    ref.watch(undoProvider) > 0 ? _undo : null,
+              ),
               _sortMenu(l10n, sort),
               PopupMenuButton<String>(
                 onSelected: (v) => switch (v) {

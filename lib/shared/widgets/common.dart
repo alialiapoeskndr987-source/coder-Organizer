@@ -2,18 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:coder_organizer/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/constants/category_catalog.dart';
 import '../../core/models/enums.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/db/app_database.dart';
 import '../../features/paywall/paywall_screen.dart';
 import '../../providers/core_providers.dart';
 
-// ── l10n label helpers ────────────────────────────────────────────────
+// ── l10n label helpers ────────────────────────────────────
 String nodeTypeLabel(AppLocalizations l10n, NodeType t) => switch (t) {
       NodeType.mainTab => l10n.mainTab,
       NodeType.subTab => l10n.subTab,
       NodeType.section => l10n.section,
       NodeType.project => l10n.project,
+      NodeType.item => l10n.item,
     };
+
+/// v2.0 (D-023) — display name of a catalog entry: fixed entries are
+/// localized in code (the internal number stays hidden), editable entries
+/// show the user-set name or a numbered placeholder.
+String categoryDisplayName(AppLocalizations l10n, CategoryRow row) {
+  if (!row.isEditable) {
+    final i = row.number - 1;
+    if (i >= 0 && i < CategoryCatalog.fixed.length) {
+      final pair = CategoryCatalog.fixed[i];
+      return l10n.localeName.startsWith('ar') ? pair.$2 : pair.$1;
+    }
+  }
+  return row.name ?? l10n.categoryNumber(row.number);
+}
 
 String templateLabel(AppLocalizations l10n, NodeTemplate t) => switch (t) {
       NodeTemplate.client => l10n.tplClient,
@@ -153,6 +170,31 @@ class PaywallGate {
       MaterialPageRoute(builder: (_) => const PaywallScreen()),
     );
     return ref.read(trialProvider).value?.canEdit ?? false;
+  }
+
+  /// v2.0 (D-026) — limit dialog for the free tier (10 projects / 1 profile).
+  static Future<void> showLimitDialog(
+      BuildContext context, String message) async {
+    final l10n = AppLocalizations.of(context)!;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.upgradeTitle),
+        content: Text(message),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: Text(l10n.cancel)),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.of(ctx).push(MaterialPageRoute(
+                  builder: (_) => const PaywallScreen()));
+            },
+            child: Text(l10n.upgrade),
+          ),
+        ],
+      ),
+    );
   }
 }
 

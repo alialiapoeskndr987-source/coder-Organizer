@@ -2,9 +2,15 @@ import 'package:drift/drift.dart';
 import '../../core/models/enums.dart';
 
 /// Hierarchy node (FR-03): mainTab → subTab → section → project (4 levels).
+/// v2.0 — the chain is optional (D-022: any level may be skipped) and a
+/// project may hold a free tree of [NodeType.item] children (D-027).
+/// v2.0 — every node belongs to a profile (D-021) and optionally to a
+/// category from the 50-entry catalog (D-023).
 class Nodes extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get parentId => integer().nullable().references(Nodes, #id)();
+  IntColumn get profileId => integer().nullable().references(Profiles, #id)();
+  IntColumn get categoryId => integer().nullable().references(Categories, #id)();
   TextColumn get name => text().withLength(min: 1, max: 120)();
   TextColumn get type => textEnum<NodeType>()();
   TextColumn get template => textEnum<NodeTemplate>().nullable()();
@@ -15,6 +21,29 @@ class Nodes extends Table {
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
   DateTimeColumn get deletedAt => dateTime().nullable()(); // trash (D-010)
+}
+
+/// v2.0 (D-021) — isolated workspaces ("profiles"): up to 10 (Pro) with
+/// independent settings and data. Deleted profiles go to the profile trash
+/// (D-024) and can be restored or permanently removed.
+class Profiles extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().withLength(min: 1, max: 60)();
+  IntColumn get sortIndex => integer().withDefault(const Constant(0))();
+  DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+  DateTimeColumn get deletedAt => dateTime().nullable()(); // profile trash (D-024)
+}
+
+/// v2.0 (D-023) — 50-entry category catalog: 40 fixed global entries
+/// (profileId = null, number 1..40, localized in code) + 10 per-profile
+/// editable entries (number 41..50, name is user-set; null = placeholder).
+@DataClassName('CategoryRow')
+class Categories extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get profileId => integer().nullable().references(Profiles, #id)();
+  IntColumn get number => integer()(); // hidden internal number 1..50
+  TextColumn get name => text().nullable()(); // editable rows: null until renamed
+  BoolColumn get isEditable => boolean().withDefault(const Constant(false))();
 }
 
 class Links extends Table {

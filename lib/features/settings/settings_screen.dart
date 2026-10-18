@@ -5,9 +5,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/models/enums.dart';
 import '../../core/theme/app_theme.dart';
+import '../../data/db/app_database.dart';
 import '../../providers/core_providers.dart';
+import '../../providers/profile_providers.dart';
 import '../../providers/settings_providers.dart';
 import '../../shared/widgets/common.dart';
+import '../paywall/paywall_screen.dart';
+import '../security/security_settings_section.dart';
 import '../trash/trash_screen.dart';
 
 /// FR-02 owner settings: themes (8, instant), main title, language,
@@ -24,12 +28,24 @@ class SettingsScreen extends ConsumerWidget {
     final mainTitle = ref.watch(mainTitleProvider);
     final isFirebase = ref.read(authServiceProvider).isFirebaseBacked;
     final consent = ref.watch(analyticsConsentProvider);
+    final trial = ref.watch(trialProvider).value;
+    final isPro = trial == null || trial.purchased || trial.daysLeft > 0;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
+          // v2.0 (D-021) — profiles: quick switcher + management entry.
+          SectionHeader(title: l10n.profiles),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: Text(l10n.manageProfiles),
+            subtitle: Text(l10n.profilesProNote, style: theme.textTheme.bodySmall),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => const ProfilesScreen(),
+            )),
+          ),
           SectionHeader(title: l10n.mainTitleLabel),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -56,7 +72,15 @@ class SettingsScreen extends ConsumerWidget {
                 final p = t.preset;
                 final selected = t == currentTheme;
                 return GestureDetector(
-                  onTap: () => ref.read(themeProvider.notifier).setTheme(t),
+                  onTap: () {
+                    // v2.0 (D-026) — theme changes are Pro-only.
+                    if (!isPro) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => const PaywallScreen()));
+                      return;
+                    }
+                    ref.read(themeProvider.notifier).setTheme(t);
+                  },
                   child: Container(
                     width: 108,
                     padding: const EdgeInsets.all(10),
@@ -77,6 +101,13 @@ class SettingsScreen extends ConsumerWidget {
                           _dot(Color(p.primary)),
                           const SizedBox(width: 6),
                           _dot(Color(p.accent)),
+                          const Spacer(),
+                          // v2.0 — lock badge on every theme for free users.
+                          if (!isPro)
+                            Icon(Icons.lock,
+                                size: 14,
+                                color: Color(p.primary)
+                                    .withValues(alpha: 0.8)),
                         ]),
                         const Spacer(),
                         Text(
@@ -153,11 +184,26 @@ class SettingsScreen extends ConsumerWidget {
                 ref.read(homePrefsProvider.notifier).setCompactGrid(v),
           ),
 
+          // v2.0 (D-028..D-031) — security & anti-theft.
+          SectionHeader(title: l10n.securitySection),
+          const SecuritySettingsSection(),
+
+          // v2.0 (D-023) — editable category names for the current profile.
+          SectionHeader(
+            title: l10n.editCategories,
+            trailing: Text(l10n.categoryFixedNote,
+                style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant)),
+          ),
+          const _EditableCategories(),
+
           SectionHeader(title: l10n.dataSection),
           ListTile(
             leading: const Icon(Icons.ios_share),
             title: Text(l10n.exportData),
             onTap: () async {
+              // v2.0 (D-028) — optional password gate on sensitive actions.
+              if (!await requestSensitiveAuth(context, ref)) return;
               final ok =
                   await ref.read(importExportProvider).exportToFile();
               if (context.mounted) {
@@ -249,6 +295,9 @@ class SettingsScreen extends ConsumerWidget {
       );
 
   Future<void> _importFlow(BuildContext context, WidgetRef ref) async {
+    // v2.0 (D-028) — optional password gate on sensitive actions.
+    if (!await requestSensitiveAuth(context, ref)) return;
+    if (!context.mounted) return;
     final l10n = AppLocalizations.of(context)!;
     final service = ref.read(importExportProvider);
     final decoded = await service.pickAndDecode();
@@ -370,5 +419,66 @@ class SettingsScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) showError(context, l10n.authError);
     }
+  }
+}
+
+/// v2.0 (D-023) — the current profile's 10 editable catalog entries
+/// (numbers 41..50, hidden). Only the display name is user-settable.
+class _EditableCategories extends ConsumerWidget {
+  const _EditableCategories();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final profileId = ref.watch(currentProfileIdProvider);
+    final catsAsync = ref.watch(categoriesProvider(profileId));
+    final editable = (catsAsync.value ?? const <CategoryRow>[])
+        .where((c) => c.isEditable)
+        .toList();
+
+    return Column(
+      children: [
+        for (final c in editable)
+          ListTile(
+            dense: true,
+            leading: Icon(Icons.label_outline,
+                size: 20, color: theme.colorScheme.primary),
+            title: Text(categoryDisplayName(l10n, c)),
+            subtitle: Text(l10n.categoryNumber(c.number),
+                style: theme.textTheme.bodySmall),
+            trailing: const Icon(Icons.edit_outlined, size: 18),
+            onTap: () async {
+              final controller = TextEditingController(text: c.name ?? '');
+              final ok = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: Text(l10n.renameCategory),
+                  content: TextField(
+                    controller: controller,
+                    autofocus: true,
+                    maxLength: 60,
+                    decoration:
+                        InputDecoration(labelText: l10n.categoryName),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: Text(l10n.cancel)),
+                    FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: Text(l10n.save)),
+                  ],
+                ),
+              );
+              if (ok != true) return;
+              final name = controller.text.trim();
+              await ref
+                  .read(appDatabaseProvider)
+                  .renameCategory(c.id, name);
+            },
+          ),
+      ],
+    );
   }
 }

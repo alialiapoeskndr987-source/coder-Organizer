@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:coder_organizer/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/enums.dart';
 import '../../data/db/app_database.dart';
+import '../../providers/profile_providers.dart';
 import '../../providers/tree_providers.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/icon_registry.dart';
@@ -25,6 +27,8 @@ class _CreateAssistantScreenState extends ConsumerState<CreateAssistantScreen> {
   int? _tabId;
   int? _subId;
   int? _sectionId;
+  int? _itemParentId; // v2.0 — free-tree parent for NodeType.item
+  int? _categoryId; // v2.0 (D-023) — optional catalog entry
   NodeTemplate _template = NodeTemplate.custom;
   String _icon = 'folder';
   final _name = TextEditingController();
@@ -39,6 +43,7 @@ class _CreateAssistantScreenState extends ConsumerState<CreateAssistantScreen> {
       NodeType.subTab => 'folder',
       NodeType.section => 'doc',
       NodeType.project => 'code',
+      NodeType.item => 'extension',
     };
     if (widget.presetParentId != null) {
       // Pre-resolve preset parent to the right level.
@@ -59,7 +64,7 @@ class _CreateAssistantScreenState extends ConsumerState<CreateAssistantScreen> {
               _tabId = _rootOf(tree, parent);
               _subId = parent.parentId;
               _sectionId = parent.id;
-            case NodeType.project:
+            case NodeType.project || NodeType.item:
               break;
           }
         });
@@ -127,26 +132,33 @@ class _CreateAssistantScreenState extends ConsumerState<CreateAssistantScreen> {
       return;
     }
     final actions = ref.read(nodeActionsProvider);
+    int? parentId;
     switch (_type) {
       case NodeType.mainTab:
-        await actions.createNode(name: name, type: _type, icon: _icon);
+        parentId = null;
       case NodeType.subTab:
-        if (_tabId == null) return;
-        await actions.createNode(
-            name: name, type: _type, parentId: _tabId, icon: _icon);
+        parentId = _tabId;
       case NodeType.section:
-        if (_subId == null) return;
-        await actions.createNode(
-            name: name, type: _type, parentId: _subId, icon: _icon);
+        parentId = _subId;
       case NodeType.project:
-        if (_sectionId == null) return;
-        await actions.createNode(
-          name: name,
-          type: _type,
-          parentId: _sectionId,
-          icon: _icon,
-          template: _template,
-        );
+        parentId = _sectionId;
+      case NodeType.item:
+        parentId = _itemParentId;
+    }
+    if (_type != NodeType.mainTab && parentId == null) return;
+    try {
+      await actions.createNode(
+        name: name,
+        type: _type,
+        parentId: parentId,
+        categoryId: _categoryId,
+        icon: _icon,
+        template: _type == NodeType.project ? _template : null,
+      );
+    } on ProjectLimitReached {
+      if (!mounted) return;
+      await PaywallGate.showLimitDialog(context, l10n.projectLimitReached);
+      return;
     }
     if (mounted) Navigator.pop(context);
   }
@@ -156,6 +168,10 @@ class _CreateAssistantScreenState extends ConsumerState<CreateAssistantScreen> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final tree = ref.watch(treeProvider).value ?? const TreeState([]);
+    // v2.0 (D-023) — catalog entries for the current profile.
+    final profileId = ref.watch(currentProfileIdProvider);
+    final categories =
+        ref.watch(categoriesProvider(profileId)).value ?? const <CategoryRow>[];
     final tabs = _childrenOf(tree.nodes, null);
     final subs = _tabId == null ? <Node>[] : _childrenOf(tree.nodes, _tabId);
     final sections =
@@ -217,12 +233,13 @@ class _CreateAssistantScreenState extends ConsumerState<CreateAssistantScreen> {
                   selected: _type == t,
                   onSelected: (_) => setState(() {
                     _type = t;
-                    _tabId = _subId = _sectionId = null;
+                    _tabId = _subId = _sectionId = _itemParentId = null;
                     _icon = switch (t) {
                       NodeType.mainTab => 'layers',
                       NodeType.subTab => 'folder',
                       NodeType.section => 'doc',
                       NodeType.project => 'code',
+                      NodeType.item => 'extension',
                     };
                   }),
                 ),
@@ -235,6 +252,48 @@ class _CreateAssistantScreenState extends ConsumerState<CreateAssistantScreen> {
             decoration: InputDecoration(labelText: l10n.name),
           ),
           const SizedBox(height: 14),
+          // v2.0 (D-027) — free-tree parent picker for item nodes.
+          if (_type == NodeType.item)
+            DropdownButtonFormField<int>(
+              initialValue: _itemParentId,
+              isExpanded: true,
+              decoration: InputDecoration(labelText: l10n.parentItem),
+              items: [
+                for (final n in tree.nodes)
+                  DropdownMenuItem(
+                    value: n.id,
+                    child: Row(children: [
+                      Icon(iconFor(n.icon),
+                          size: 18, color: theme.colorScheme.primary),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: Text(n.name,
+                              overflow: TextOverflow.ellipsis)),
+                    ]),
+                  ),
+              ],
+              onChanged: (v) => setState(() => _itemParentId = v),
+            ),
+          if (_type == NodeType.project || _type == NodeType.item) ...[
+            const SizedBox(height: 14),
+            DropdownButtonFormField<int>(
+              // v2.0 (D-023) — optional category from the 50-entry catalog.
+              initialValue: _categoryId,
+              isExpanded: true,
+              decoration: InputDecoration(labelText: l10n.categoryOptional),
+              items: [
+                DropdownMenuItem<int>(
+                    value: null, child: Text(l10n.allCategories)),
+                for (final c in categories)
+                  DropdownMenuItem(
+                    value: c.id,
+                    child: Text(categoryDisplayName(l10n, c),
+                        overflow: TextOverflow.ellipsis),
+                  ),
+              ],
+              onChanged: (v) => setState(() => _categoryId = v),
+            ),
+          ],
           // Parent chain (contextual)
           if (_type == NodeType.subTab)
             dropdown(

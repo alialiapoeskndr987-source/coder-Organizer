@@ -6,6 +6,8 @@ import '../core/models/enums.dart';
 import '../data/db/app_database.dart';
 import '../data/services/notification_service.dart';
 import 'core_providers.dart';
+import 'profile_providers.dart';
+import 'undo_providers.dart';
 
 // ── In-memory tree state (FR-03/04/05) ────────────────────────────────
 class TreeState {
@@ -69,6 +71,7 @@ class TreeState {
   }
 
   /// FR-04 — structural filter + literal text, instant.
+  /// v2.0 — optional category filter (D-023).
   List<Node> search({
     String query = '',
     int? tabId,
@@ -76,6 +79,7 @@ class TreeState {
     int? sectionId,
     NodeType? type,
     NodeStatus? status,
+    int? categoryId,
   }) {
     Iterable<Node> pool = nodes;
     if (sectionId != null) {
@@ -89,6 +93,9 @@ class TreeState {
     }
     if (type != null) pool = pool.where((n) => n.type == type);
     if (status != null) pool = pool.where((n) => n.status == status);
+    if (categoryId != null) {
+      pool = pool.where((n) => n.categoryId == categoryId);
+    }
     final q = query.trim().toLowerCase();
     if (q.isNotEmpty) pool = pool.where((n) => n.name.toLowerCase().contains(q));
     return pool.toList();
@@ -118,48 +125,85 @@ List<Node> sortNodes(List<Node> list, NodeSort sort) {
 
 final treeProvider = StreamProvider<TreeState>((ref) {
   final db = ref.watch(appDatabaseProvider);
-  return db.nodesDao.watchNodes().asyncMap((nodes) async {
+  final profileId = ref.watch(currentProfileIdProvider);
+  return db.nodesDao.watchNodes(profileId: profileId).asyncMap((nodes) async {
     final counts = await db.visitCountsSince(
         DateTime.now().subtract(const Duration(days: 7)));
     return TreeState(nodes, visitCounts: counts);
   });
 });
 
-// ── Node actions (FR-03 edit/delete + D-010 undo/trash) ──────────────
+// ── Node actions (FR-03 edit/delete + D-010 undo/trash + v2.0 limits) ─
 class NodeActions {
   final Ref _ref;
   DeleteSnapshot? _lastDelete;
   NodeActions(this._ref);
 
   AppDatabase get _db => _ref.read(appDatabaseProvider);
+  int get _profileId => _ref.read(currentProfileIdProvider);
+
+  /// v2.0 (D-026) — Pro entitlement: purchased, or inside the 30-day trial.
+  bool get _isPro {
+    final t = _ref.read(trialProvider).value;
+    if (t == null) return true; // still loading — do not block
+    return t.purchased || t.daysLeft > 0;
+  }
 
   Future<int> createNode({
     required String name,
     required NodeType type,
     NodeTemplate? template,
     int? parentId,
+    int? categoryId,
     String icon = 'folder',
   }) async {
+    // v2.0 (D-026) — free tier holds 10 projects per profile.
+    if (type == NodeType.project && !_isPro) {
+      final count = await _db.nodesDao.countProjects(_profileId);
+      if (count >= AppConstants.maxProjectsFree) {
+        throw const ProjectLimitReached();
+      }
+    }
     final id = await _db.nodesDao.addNode(
       NodesCompanion.insert(
         name: name,
         type: type,
         template: Value(template),
         parentId: Value(parentId),
+        profileId: Value(_profileId),
+        categoryId: Value(categoryId),
         icon: Value(icon),
       ),
     );
+    _ref.read(undoProvider.notifier).push(CreateNodeOp(id));
     if (type == NodeType.project) {
       _ref.read(analyticsProvider).log('first_project_created');
     }
     return id;
   }
 
-  Future<void> updateNode(int id, NodesCompanion entry) =>
-      _db.nodesDao.updateNode(id, entry);
+  Future<void> updateNode(int id, NodesCompanion entry) async {
+    // v2.0 (D-025) — capture the old values for reversible undo.
+    final old = await _db.nodesDao.getNode(id);
+    await _db.nodesDao.updateNode(id, entry);
+    if (old == null) return;
+    final undo = _ref.read(undoProvider.notifier);
+    if (entry.name.present && entry.name.value != old.name) {
+      undo.push(RenameNodeOp(id, old.name));
+    }
+    if (entry.parentId.present && entry.parentId.value != old.parentId) {
+      undo.push(MoveNodeOp(id, old.parentId));
+    }
+    if (entry.categoryId.present && entry.categoryId.value != old.categoryId) {
+      undo.push(SetCategoryOp(id, old.categoryId));
+    }
+  }
 
-  Future<DeleteSnapshot> deleteNode(int id) async =>
-      _lastDelete = await _db.nodesDao.softDeleteSubtree(id);
+  Future<DeleteSnapshot> deleteNode(int id) async {
+    final snap = _lastDelete = await _db.nodesDao.softDeleteSubtree(id);
+    _ref.read(undoProvider.notifier).push(DeleteNodeOp(snap));
+    return snap;
+  }
 
   Future<void> undoDelete() async {
     final s = _lastDelete;
@@ -286,6 +330,11 @@ class ElementActions {
 
 class NotesLimitReached implements Exception {
   const NotesLimitReached();
+}
+
+/// v2.0 (D-026) — thrown when the free tier's 10-project cap is hit.
+class ProjectLimitReached implements Exception {
+  const ProjectLimitReached();
 }
 
 final elementActionsProvider =

@@ -645,4 +645,239 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get theme8 => 'ذهبي منتصف الليل';
+
+  @override
+  String get item => 'عنصر';
+
+  @override
+  String get upgradeTitle => 'الترقية إلى النسخة المدفوعة';
+
+  @override
+  String get unlock => 'فتح';
+
+  @override
+  String get lockTitle => 'التطبيق مقفل';
+
+  @override
+  String get enterPassword => 'أدخل كلمة المرور للمتابعة';
+
+  @override
+  String get wrongPassword => 'كلمة المرور خاطئة';
+
+  @override
+  String get wrongCode => 'الرمز خاطئ';
+
+  @override
+  String get enterTotp => 'رمز من 6 أرقام';
+
+  @override
+  String get appPassword => 'كلمة مرور التطبيق';
+
+  @override
+  String get totpLockTitle => 'مطلوب تحقق';
+
+  @override
+  String get totpLockMsg => 'تجاوزت عدد المحاولات الخاطئة لكلمة المرور. أدخل الرمز الحالي من 6 أرقام من تطبيق المصادقة لفتح التطبيق. لا يُعرض أي محتوى آخر.';
+
+  @override
+  String get lockedHint => 'يبقى التطبيق مقفلاً بالكامل حتى إدخال رمز صحيح.';
+
+  @override
+  String get useRecoveryCode => 'استخدام رمز استرداد';
+
+  @override
+  String get recoveryCode => 'رمز الاسترداد';
+
+  @override
+  String get totpSetupTitle => 'إعداد تحقق مكافحة السرقة';
+
+  @override
+  String get totpStep1 => 'امسح رمز QR بتطبيق المصادقة (Google Authenticator أو أي تطبيق يدعم TOTP) أو انسخ المفتاح السري يدوياً. كل شيء يبقى على جهازك — بلا أي اتصال بالإنترنت.';
+
+  @override
+  String get totpStep2 => 'أدخل الرمز الحالي من 6 أرقام لتأكيد الإعداد';
+
+  @override
+  String get secretKey => 'المفتاح السري';
+
+  @override
+  String get copy => 'نسخ';
+
+  @override
+  String get copied => 'تم النسخ';
+
+  @override
+  String get copyCodes => 'نسخ كل الرموز';
+
+  @override
+  String get savedCodesConfirm => 'حفظت الرموز';
+
+  @override
+  String get totpEnabledDone => 'تم تفعيل تحقق مكافحة السرقة';
+
+  @override
+  String get recoveryCodesDesc => 'احفظ رموز الاسترداد لمرة واحدة في مكان آمن (مثلاً أرسلها لنفسك في تلغرام). يعمل كل رمز مرة واحدة إذا فقدت تطبيق المصادقة.';
+
+  @override
+  String get securitySection => 'الأمان';
+
+  @override
+  String get setAppPassword => 'تعيين كلمة مرور للتطبيق';
+
+  @override
+  String get changeAppPassword => 'تغيير كلمة مرور التطبيق';
+
+  @override
+  String get removeAppPassword => 'إزالة كلمة المرور';
+
+  @override
+  String get removePasswordWarn => 'إزالة كلمة المرور تعطّل تحقق مكافحة السرقة وتحذف رموز الاسترداد. هل تريد المتابعة؟';
+
+  @override
+  String get requireOnOpen => 'طلب كلمة المرور عند كل فتح للتطبيق';
+
+  @override
+  String get requireOnActions => 'طلب كلمة المرور عند الإجراءات الحساسة';
+
+  @override
+  String get sensitiveHint => 'التصدير والاستيراد والحذف النهائي وتغييرات الأمان';
+
+  @override
+  String get autoLock => 'قفل تلقائي بعد الخمول';
+
+  @override
+  String get lock1m => 'دقيقة واحدة';
+
+  @override
+  String get lock5m => '5 دقائق';
+
+  @override
+  String get lock15m => '15 دقيقة';
+
+  @override
+  String get lock30m => '30 دقيقة';
+
+  @override
+  String get lock2h => 'ساعتان';
+
+  @override
+  String get antiTheft => 'تحقق مكافحة السرقة';
+
+  @override
+  String get antiTheftEnabledLabel => 'مفعّل — يُطلب رمز المصادقة بعد تجاوز المحاولات الخاطئة';
+
+  @override
+  String get antiTheftDesc => 'بعد تجاوز حد المحاولات الخاطئة يقفل التطبيق بالكامل ويطلب رمزاً من 6 أرقام من تطبيق المصادقة. يعمل بلا إنترنت.';
+
+  @override
+  String get antiTheftProNote => 'متاح في النسخة المدفوعة';
+
+  @override
+  String get maxAttempts => 'عدد المحاولات الخاطئة قبل القفل';
+
+  @override
+  String get passwordRequiredTitle => 'تأكيد الهوية';
+
+  @override
+  String get saved => 'تم الحفظ';
+
+  @override
+  String get next => 'التالي';
+
+  @override
+  String get profiles => 'الملفات الشخصية';
+
+  @override
+  String get manageProfiles => 'إدارة الملفات الشخصية';
+
+  @override
+  String get profilesProNote => 'المجانية: ملف واحد · المدفوعة: حتى 10 ملفات';
+
+  @override
+  String get addProfile => 'إضافة ملف شخصي';
+
+  @override
+  String get profileName => 'اسم الملف';
+
+  @override
+  String get currentProfile => 'الملف الحالي';
+
+  @override
+  String get deleteProfile => 'حذف الملف الشخصي';
+
+  @override
+  String get deleteProfileWarn => 'ينتقل الملف وكل محتواه إلى السلة، ويمكن استعادته لاحقاً.';
+
+  @override
+  String get profileTrashed => 'انتقل الملف إلى السلة';
+
+  @override
+  String get profilesTrash => 'الملفات المحذوفة';
+
+  @override
+  String get purgeProfiles => 'إفراغ سلة الملفات';
+
+  @override
+  String get profileRestored => 'استُعيد الملف';
+
+  @override
+  String get switchTo => 'التبديل إلى هذا الملف';
+
+  @override
+  String get profileLimitReached => 'النسخة المجانية تحوي ملفاً واحداً. رقِّ إلى Pro للحصول على 10 ملفات.';
+
+  @override
+  String get projectLimitReached => 'النسخة المجانية تحوي 10 مشاريع. رقِّ إلى Pro لمشاريع بلا حدود.';
+
+  @override
+  String get trashItemsTab => 'العناصر';
+
+  @override
+  String get editCategories => 'أسماء التصنيفات القابلة للتعديل (هذا الملف)';
+
+  @override
+  String get categoryFixedNote => '40 ثابت + 10 قابلة للتعديل';
+
+  @override
+  String get renameCategory => 'تعديل اسم التصنيف';
+
+  @override
+  String get categoryName => 'اسم التصنيف';
+
+  @override
+  String get filterCategory => 'التصنيف';
+
+  @override
+  String get allCategories => 'كل التصنيفات';
+
+  @override
+  String get parentItem => 'العقدة الأب';
+
+  @override
+  String get categoryOptional => 'التصنيف (اختياري)';
+
+  @override
+  String get pathsTitle => 'المسارات';
+
+  @override
+  String get undoLast => 'تراجع عن آخر تغيير';
+
+  @override
+  String get undoDone => 'تم التراجع';
+
+  @override
+  String get nothingToUndo => 'لا يوجد ما يمكن التراجع عنه';
+
+  @override
+  String get openTree => 'فتح الشجرة';
+
+  @override
+  String attemptsOption(int n) {
+  return '$n محاولات';
+  }
+
+  @override
+  String categoryNumber(int n) {
+  return 'تصنيف $n';
+  }
 }

@@ -649,4 +649,239 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get theme8 => 'Midnight Gold';
+
+  @override
+  String get item => 'Item';
+
+  @override
+  String get upgradeTitle => 'Upgrade to Pro';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get lockTitle => 'App locked';
+
+  @override
+  String get enterPassword => 'Enter your password to continue';
+
+  @override
+  String get wrongPassword => 'Wrong password';
+
+  @override
+  String get wrongCode => 'Wrong code';
+
+  @override
+  String get enterTotp => '6-digit code';
+
+  @override
+  String get appPassword => 'App password';
+
+  @override
+  String get totpLockTitle => 'Verification required';
+
+  @override
+  String get totpLockMsg => 'Too many wrong password attempts. Enter the 6-digit code from your authenticator app to unlock. Nothing else is shown.';
+
+  @override
+  String get lockedHint => 'The app stays fully locked until a valid code is entered.';
+
+  @override
+  String get useRecoveryCode => 'Use a recovery code';
+
+  @override
+  String get recoveryCode => 'Recovery code';
+
+  @override
+  String get totpSetupTitle => 'Set up anti-theft verification';
+
+  @override
+  String get totpStep1 => 'Scan this QR code with your authenticator app (Google Authenticator or any TOTP app), or copy the secret key manually. Everything stays on your device — no network needed.';
+
+  @override
+  String get totpStep2 => 'Enter the current 6-digit code to confirm enrollment';
+
+  @override
+  String get secretKey => 'Secret key';
+
+  @override
+  String get copy => 'Copy';
+
+  @override
+  String get copied => 'Copied to clipboard';
+
+  @override
+  String get copyCodes => 'Copy all codes';
+
+  @override
+  String get savedCodesConfirm => 'I saved my codes';
+
+  @override
+  String get totpEnabledDone => 'Anti-theft verification is enabled';
+
+  @override
+  String get recoveryCodesDesc => 'Save these one-time codes somewhere safe (for example, send them to yourself on Telegram). Each code works once if you ever lose access to your authenticator.';
+
+  @override
+  String get securitySection => 'Security';
+
+  @override
+  String get setAppPassword => 'Set app password';
+
+  @override
+  String get changeAppPassword => 'Change app password';
+
+  @override
+  String get removeAppPassword => 'Remove password';
+
+  @override
+  String get removePasswordWarn => 'Removing the password also disables anti-theft verification and deletes your recovery codes. Continue?';
+
+  @override
+  String get requireOnOpen => 'Ask for password on every app open';
+
+  @override
+  String get requireOnActions => 'Ask for password on sensitive actions';
+
+  @override
+  String get sensitiveHint => 'Export, import, permanent delete and security changes';
+
+  @override
+  String get autoLock => 'Auto-lock after inactivity';
+
+  @override
+  String get lock1m => '1 minute';
+
+  @override
+  String get lock5m => '5 minutes';
+
+  @override
+  String get lock15m => '15 minutes';
+
+  @override
+  String get lock30m => '30 minutes';
+
+  @override
+  String get lock2h => '2 hours';
+
+  @override
+  String get antiTheft => 'Anti-theft verification';
+
+  @override
+  String get antiTheftEnabledLabel => 'Enabled — authenticator code required after failed attempts';
+
+  @override
+  String get antiTheftDesc => 'After the failed-attempts limit, the app locks completely and asks for a 6-digit code from your authenticator app. Works offline.';
+
+  @override
+  String get antiTheftProNote => 'Available in Pro';
+
+  @override
+  String get maxAttempts => 'Failed attempts before lock';
+
+  @override
+  String get passwordRequiredTitle => 'Confirm it\'s you';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get profiles => 'Profiles';
+
+  @override
+  String get manageProfiles => 'Manage profiles';
+
+  @override
+  String get profilesProNote => 'Free: 1 profile · Pro: up to 10 profiles';
+
+  @override
+  String get addProfile => 'Add profile';
+
+  @override
+  String get profileName => 'Profile name';
+
+  @override
+  String get currentProfile => 'Current profile';
+
+  @override
+  String get deleteProfile => 'Delete profile';
+
+  @override
+  String get deleteProfileWarn => 'The profile and ALL its content move to the trash. You can restore it later.';
+
+  @override
+  String get profileTrashed => 'Profile moved to trash';
+
+  @override
+  String get profilesTrash => 'Deleted profiles';
+
+  @override
+  String get purgeProfiles => 'Empty profiles trash';
+
+  @override
+  String get profileRestored => 'Profile restored';
+
+  @override
+  String get switchTo => 'Switch to this profile';
+
+  @override
+  String get profileLimitReached => 'The free version holds 1 profile. Upgrade to Pro for 10 profiles.';
+
+  @override
+  String get projectLimitReached => 'The free version holds 10 projects. Upgrade to Pro for unlimited projects.';
+
+  @override
+  String get trashItemsTab => 'Items';
+
+  @override
+  String get editCategories => 'Editable category names (this profile)';
+
+  @override
+  String get categoryFixedNote => '40 fixed + 10 editable';
+
+  @override
+  String get renameCategory => 'Rename category';
+
+  @override
+  String get categoryName => 'Category name';
+
+  @override
+  String get filterCategory => 'Category';
+
+  @override
+  String get allCategories => 'All categories';
+
+  @override
+  String get parentItem => 'Parent node';
+
+  @override
+  String get categoryOptional => 'Category (optional)';
+
+  @override
+  String get pathsTitle => 'Paths';
+
+  @override
+  String get undoLast => 'Undo last change';
+
+  @override
+  String get undoDone => 'Undone';
+
+  @override
+  String get nothingToUndo => 'Nothing to undo';
+
+  @override
+  String get openTree => 'Open tree';
+
+  @override
+  String attemptsOption(int n) {
+  return '$n attempts';
+  }
+
+  @override
+  String categoryNumber(int n) {
+  return 'Category $n';
+  }
 }

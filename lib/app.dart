@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'data/services/notification_service.dart';
 import 'features/node/node_details_screen.dart';
+import 'features/security/lock_gate.dart';
 import 'features/splash/splash_screen.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/settings_providers.dart';
@@ -57,7 +58,9 @@ class _CoderOrganizerAppState extends ConsumerState<CoderOrganizerApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [Locale('en'), Locale('ar')],
-      home: const SplashScreen(),
+      // v2.0 — LockGate renders nothing until the security bootstrap
+      // decides, then either the app or the full-screen lock (no flash).
+      home: const LockGate(child: SplashScreen()),
     );
   }
 }

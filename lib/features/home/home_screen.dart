@@ -11,6 +11,8 @@ import '../../shared/widgets/common.dart';
 import '../../shared/widgets/icon_registry.dart';
 import '../create/create_assistant_screen.dart';
 import '../paywall/paywall_screen.dart';
+import '../paths/paths_screen.dart';
+import '../profiles/profile_switcher.dart';
 import '../search/search_screen.dart';
 import '../trash/trash_screen.dart';
 import '../tree/tree_browser_screen.dart';
@@ -45,6 +47,14 @@ class HomeScreen extends ConsumerWidget {
               ?.copyWith(fontWeight: FontWeight.w800),
         ),
         actions: [
+          const ProfileSwitcher(),
+          IconButton(
+            tooltip: l10n.pathsTitle,
+            icon: const Icon(Icons.account_tree_outlined),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const PathsScreen()),
+            ),
+          ),
           IconButton(
             tooltip: l10n.search,
             icon: const Icon(Icons.search),

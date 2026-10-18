@@ -6,6 +6,7 @@ import 'app.dart';
 import 'core/theme/app_theme.dart';
 import 'data/db/app_database.dart';
 import 'providers/core_providers.dart';
+import 'providers/profile_providers.dart';
 import 'providers/settings_providers.dart';
 
 Future<void> main() async {
@@ -36,6 +37,17 @@ Future<void> main() async {
   final initialLocale =
       (savedLocale == null || savedLocale.isEmpty) ? null : Locale(savedLocale);
 
+  // v2.0 (D-021) — resolve the active profile before the first frame and
+  // give the seeded default profile a localized name exactly once.
+  final profiles = await db.watchProfiles().first;
+  final savedProfileId =
+      int.tryParse(await db.getSetting('current_profile_id') ?? '') ?? 1;
+  final activeProfile = profiles.any((p) => p.id == savedProfileId)
+      ? savedProfileId
+      : (profiles.isNotEmpty ? profiles.first.id : 1);
+  final isAr = (initialLocale?.languageCode ?? 'ar') == 'ar';
+  await db.renameDefaultProfileIfNeeded(isAr ? 'افتراضي' : 'Default');
+
   final container = ProviderContainer(
     overrides: [
       firebaseReadyProvider.overrideWithValue(firebaseReady),
@@ -44,6 +56,8 @@ Future<void> main() async {
           .overrideWith((ref) => ThemeController(db, initialTheme)),
       localeProvider
           .overrideWith((ref) => LocaleController(db, initialLocale)),
+      currentProfileIdProvider.overrideWith(
+          (ref) => CurrentProfileController(db, activeProfile)),
     ],
   );
 

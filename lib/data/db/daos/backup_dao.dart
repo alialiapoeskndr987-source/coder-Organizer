@@ -4,6 +4,7 @@ part of '../app_database.dart';
 /// Secrets are stripped on export (NFR-02): email passwords and secret variables.
 @DriftAccessor(tables: [
   Nodes,
+  Categories,
   Links,
   Notes,
   Emails,
@@ -19,6 +20,10 @@ class BackupDao extends DatabaseAccessor<AppDatabase> with _$BackupDaoMixin {
   Future<Map<String, dynamic>> exportJson() async {
     String? dt(DateTime? d) => d?.toIso8601String();
     final ns = await (select(nodes)..where((n) => n.deletedAt.isNull())).get();
+    // v2.0 — resolve category ids to their stable internal numbers (D-023)
+    // so a backup can be restored on any device with the same catalog.
+    final catRows = await select(categories).get();
+    final catNumberById = {for (final c in catRows) c.id: c.number};
     final ls = await (select(links)..where((l) => l.deletedAt.isNull())).get();
     final nts = await (select(notes)..where((n) => n.deletedAt.isNull())).get();
     final es = await (select(emails)..where((e) => e.deletedAt.isNull())).get();
@@ -45,6 +50,8 @@ class BackupDao extends DatabaseAccessor<AppDatabase> with _$BackupDaoMixin {
             'icon': n.icon,
             'status': n.status.name,
             'sortIndex': n.sortIndex,
+            'categoryNumber':
+                n.categoryId == null ? null : catNumberById[n.categoryId!],
             'createdAt': dt(n.createdAt),
           },
       ],
@@ -134,7 +141,18 @@ class BackupDao extends DatabaseAccessor<AppDatabase> with _$BackupDaoMixin {
       final idMap = <int, int>{};
       final nodeList = listOf('nodes');
 
+      // v2.0 — imported nodes land in the current profile (D-021).
+      final currentProfile = int.tryParse(
+              await attachedDatabase.getSetting('current_profile_id') ?? '') ??
+          1;
+
       for (final n in nodeList) {
+        final catNumber = (n['categoryNumber'] as num?)?.toInt();
+        int? categoryId;
+        if (catNumber != null) {
+          categoryId =
+              await attachedDatabase.categoryIdByNumber(catNumber, currentProfile);
+        }
         final newId = await into(nodes).insert(
           NodesCompanion.insert(
             name: n['name'] as String,
@@ -147,6 +165,8 @@ class BackupDao extends DatabaseAccessor<AppDatabase> with _$BackupDaoMixin {
                 ? const Value(NodeStatus.active)
                 : Value(NodeStatus.values.byName(n['status'] as String)),
             sortIndex: Value((n['sortIndex'] as num?)?.toInt() ?? 0),
+            profileId: Value(currentProfile),
+            categoryId: Value(categoryId),
             createdAt: Value(
                 DateTime.tryParse(n['createdAt'] as String? ?? '') ??
                     DateTime.now()),

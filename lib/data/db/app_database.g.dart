@@ -31,9 +31,28 @@ class $NodesTable extends Nodes with TableInfo<$NodesTable, Node> {
     true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _categoryIdMeta = const VerificationMeta(
+    'categoryId',
+  );
+  @override
+  late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
+    'category_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
   @override
@@ -148,6 +167,8 @@ class $NodesTable extends Nodes with TableInfo<$NodesTable, Node> {
   List<GeneratedColumn> get $columns => [
     id,
     parentId,
+    profileId,
+    categoryId,
     name,
     type,
     template,
@@ -178,6 +199,18 @@ class $NodesTable extends Nodes with TableInfo<$NodesTable, Node> {
       context.handle(
         _parentIdMeta,
         parentId.isAcceptableOrUnknown(data['parent_id']!, _parentIdMeta),
+      );
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    }
+    if (data.containsKey('category_id')) {
+      context.handle(
+        _categoryIdMeta,
+        categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
       );
     }
     if (data.containsKey('name')) {
@@ -244,6 +277,14 @@ class $NodesTable extends Nodes with TableInfo<$NodesTable, Node> {
       parentId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}parent_id'],
+      ),
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      ),
+      categoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}category_id'],
       ),
       name:
           attachedDatabase.typeMapping.read(
@@ -317,6 +358,8 @@ class $NodesTable extends Nodes with TableInfo<$NodesTable, Node> {
 class Node extends DataClass implements Insertable<Node> {
   final int id;
   final int? parentId;
+  final int? profileId;
+  final int? categoryId;
   final String name;
   final NodeType type;
   final NodeTemplate? template;
@@ -330,6 +373,8 @@ class Node extends DataClass implements Insertable<Node> {
   const Node({
     required this.id,
     this.parentId,
+    this.profileId,
+    this.categoryId,
     required this.name,
     required this.type,
     this.template,
@@ -347,6 +392,12 @@ class Node extends DataClass implements Insertable<Node> {
     map['id'] = Variable<int>(id);
     if (!nullToAbsent || parentId != null) {
       map['parent_id'] = Variable<int>(parentId);
+    }
+    if (!nullToAbsent || profileId != null) {
+      map['profile_id'] = Variable<int>(profileId);
+    }
+    if (!nullToAbsent || categoryId != null) {
+      map['category_id'] = Variable<int>(categoryId);
     }
     map['name'] = Variable<String>(name);
     {
@@ -382,6 +433,14 @@ class Node extends DataClass implements Insertable<Node> {
           parentId == null && nullToAbsent
               ? const Value.absent()
               : Value(parentId),
+      profileId:
+          profileId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(profileId),
+      categoryId:
+          categoryId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(categoryId),
       name: Value(name),
       type: Value(type),
       template:
@@ -412,6 +471,8 @@ class Node extends DataClass implements Insertable<Node> {
     return Node(
       id: serializer.fromJson<int>(json['id']),
       parentId: serializer.fromJson<int?>(json['parentId']),
+      profileId: serializer.fromJson<int?>(json['profileId']),
+      categoryId: serializer.fromJson<int?>(json['categoryId']),
       name: serializer.fromJson<String>(json['name']),
       type: $NodesTable.$convertertype.fromJson(
         serializer.fromJson<String>(json['type']),
@@ -436,6 +497,8 @@ class Node extends DataClass implements Insertable<Node> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'parentId': serializer.toJson<int?>(parentId),
+      'profileId': serializer.toJson<int?>(profileId),
+      'categoryId': serializer.toJson<int?>(categoryId),
       'name': serializer.toJson<String>(name),
       'type': serializer.toJson<String>(
         $NodesTable.$convertertype.toJson(type),
@@ -458,6 +521,8 @@ class Node extends DataClass implements Insertable<Node> {
   Node copyWith({
     int? id,
     Value<int?> parentId = const Value.absent(),
+    Value<int?> profileId = const Value.absent(),
+    Value<int?> categoryId = const Value.absent(),
     String? name,
     NodeType? type,
     Value<NodeTemplate?> template = const Value.absent(),
@@ -471,6 +536,8 @@ class Node extends DataClass implements Insertable<Node> {
   }) => Node(
     id: id ?? this.id,
     parentId: parentId.present ? parentId.value : this.parentId,
+    profileId: profileId.present ? profileId.value : this.profileId,
+    categoryId: categoryId.present ? categoryId.value : this.categoryId,
     name: name ?? this.name,
     type: type ?? this.type,
     template: template.present ? template.value : this.template,
@@ -486,6 +553,9 @@ class Node extends DataClass implements Insertable<Node> {
     return Node(
       id: data.id.present ? data.id.value : this.id,
       parentId: data.parentId.present ? data.parentId.value : this.parentId,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      categoryId:
+          data.categoryId.present ? data.categoryId.value : this.categoryId,
       name: data.name.present ? data.name.value : this.name,
       type: data.type.present ? data.type.value : this.type,
       template: data.template.present ? data.template.value : this.template,
@@ -507,6 +577,8 @@ class Node extends DataClass implements Insertable<Node> {
     return (StringBuffer('Node(')
           ..write('id: $id, ')
           ..write('parentId: $parentId, ')
+          ..write('profileId: $profileId, ')
+          ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('type: $type, ')
           ..write('template: $template, ')
@@ -525,6 +597,8 @@ class Node extends DataClass implements Insertable<Node> {
   int get hashCode => Object.hash(
     id,
     parentId,
+    profileId,
+    categoryId,
     name,
     type,
     template,
@@ -542,6 +616,8 @@ class Node extends DataClass implements Insertable<Node> {
       (other is Node &&
           other.id == this.id &&
           other.parentId == this.parentId &&
+          other.profileId == this.profileId &&
+          other.categoryId == this.categoryId &&
           other.name == this.name &&
           other.type == this.type &&
           other.template == this.template &&
@@ -557,6 +633,8 @@ class Node extends DataClass implements Insertable<Node> {
 class NodesCompanion extends UpdateCompanion<Node> {
   final Value<int> id;
   final Value<int?> parentId;
+  final Value<int?> profileId;
+  final Value<int?> categoryId;
   final Value<String> name;
   final Value<NodeType> type;
   final Value<NodeTemplate?> template;
@@ -570,6 +648,8 @@ class NodesCompanion extends UpdateCompanion<Node> {
   const NodesCompanion({
     this.id = const Value.absent(),
     this.parentId = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.categoryId = const Value.absent(),
     this.name = const Value.absent(),
     this.type = const Value.absent(),
     this.template = const Value.absent(),
@@ -584,6 +664,8 @@ class NodesCompanion extends UpdateCompanion<Node> {
   NodesCompanion.insert({
     this.id = const Value.absent(),
     this.parentId = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.categoryId = const Value.absent(),
     required String name,
     required NodeType type,
     this.template = const Value.absent(),
@@ -599,6 +681,8 @@ class NodesCompanion extends UpdateCompanion<Node> {
   static Insertable<Node> custom({
     Expression<int>? id,
     Expression<int>? parentId,
+    Expression<int>? profileId,
+    Expression<int>? categoryId,
     Expression<String>? name,
     Expression<String>? type,
     Expression<String>? template,
@@ -613,6 +697,8 @@ class NodesCompanion extends UpdateCompanion<Node> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (parentId != null) 'parent_id': parentId,
+      if (profileId != null) 'profile_id': profileId,
+      if (categoryId != null) 'category_id': categoryId,
       if (name != null) 'name': name,
       if (type != null) 'type': type,
       if (template != null) 'template': template,
@@ -629,6 +715,8 @@ class NodesCompanion extends UpdateCompanion<Node> {
   NodesCompanion copyWith({
     Value<int>? id,
     Value<int?>? parentId,
+    Value<int?>? profileId,
+    Value<int?>? categoryId,
     Value<String>? name,
     Value<NodeType>? type,
     Value<NodeTemplate?>? template,
@@ -643,6 +731,8 @@ class NodesCompanion extends UpdateCompanion<Node> {
     return NodesCompanion(
       id: id ?? this.id,
       parentId: parentId ?? this.parentId,
+      profileId: profileId ?? this.profileId,
+      categoryId: categoryId ?? this.categoryId,
       name: name ?? this.name,
       type: type ?? this.type,
       template: template ?? this.template,
@@ -664,6 +754,12 @@ class NodesCompanion extends UpdateCompanion<Node> {
     }
     if (parentId.present) {
       map['parent_id'] = Variable<int>(parentId.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (categoryId.present) {
+      map['category_id'] = Variable<int>(categoryId.value);
     }
     if (name.present) {
       map['name'] = Variable<String>(name.value);
@@ -709,6 +805,8 @@ class NodesCompanion extends UpdateCompanion<Node> {
     return (StringBuffer('NodesCompanion(')
           ..write('id: $id, ')
           ..write('parentId: $parentId, ')
+          ..write('profileId: $profileId, ')
+          ..write('categoryId: $categoryId, ')
           ..write('name: $name, ')
           ..write('type: $type, ')
           ..write('template: $template, ')
@@ -719,6 +817,715 @@ class NodesCompanion extends UpdateCompanion<Node> {
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProfilesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 60,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sortIndexMeta = const VerificationMeta(
+    'sortIndex',
+  );
+  @override
+  late final GeneratedColumn<int> sortIndex = GeneratedColumn<int>(
+    'sort_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    sortIndex,
+    createdAt,
+    deletedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'profiles';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Profile> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('sort_index')) {
+      context.handle(
+        _sortIndexMeta,
+        sortIndex.isAcceptableOrUnknown(data['sort_index']!, _sortIndexMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Profile map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Profile(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      name:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.string,
+            data['${effectivePrefix}name'],
+          )!,
+      sortIndex:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}sort_index'],
+          )!,
+      createdAt:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.dateTime,
+            data['${effectivePrefix}created_at'],
+          )!,
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+    );
+  }
+
+  @override
+  $ProfilesTable createAlias(String alias) {
+    return $ProfilesTable(attachedDatabase, alias);
+  }
+}
+
+class Profile extends DataClass implements Insertable<Profile> {
+  final int id;
+  final String name;
+  final int sortIndex;
+  final DateTime createdAt;
+  final DateTime? deletedAt;
+  const Profile({
+    required this.id,
+    required this.name,
+    required this.sortIndex,
+    required this.createdAt,
+    this.deletedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['sort_index'] = Variable<int>(sortIndex);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    return map;
+  }
+
+  ProfilesCompanion toCompanion(bool nullToAbsent) {
+    return ProfilesCompanion(
+      id: Value(id),
+      name: Value(name),
+      sortIndex: Value(sortIndex),
+      createdAt: Value(createdAt),
+      deletedAt:
+          deletedAt == null && nullToAbsent
+              ? const Value.absent()
+              : Value(deletedAt),
+    );
+  }
+
+  factory Profile.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Profile(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      sortIndex: serializer.fromJson<int>(json['sortIndex']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'sortIndex': serializer.toJson<int>(sortIndex),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+    };
+  }
+
+  Profile copyWith({
+    int? id,
+    String? name,
+    int? sortIndex,
+    DateTime? createdAt,
+    Value<DateTime?> deletedAt = const Value.absent(),
+  }) => Profile(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    sortIndex: sortIndex ?? this.sortIndex,
+    createdAt: createdAt ?? this.createdAt,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+  );
+  Profile copyWithCompanion(ProfilesCompanion data) {
+    return Profile(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      sortIndex: data.sortIndex.present ? data.sortIndex.value : this.sortIndex,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Profile(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortIndex: $sortIndex, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, sortIndex, createdAt, deletedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Profile &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.sortIndex == this.sortIndex &&
+          other.createdAt == this.createdAt &&
+          other.deletedAt == this.deletedAt);
+}
+
+class ProfilesCompanion extends UpdateCompanion<Profile> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> sortIndex;
+  final Value<DateTime> createdAt;
+  final Value<DateTime?> deletedAt;
+  const ProfilesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sortIndex = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  });
+  ProfilesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.sortIndex = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<Profile> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? sortIndex,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? deletedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (sortIndex != null) 'sort_index': sortIndex,
+      if (createdAt != null) 'created_at': createdAt,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+    });
+  }
+
+  ProfilesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<int>? sortIndex,
+    Value<DateTime>? createdAt,
+    Value<DateTime?>? deletedAt,
+  }) {
+    return ProfilesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      sortIndex: sortIndex ?? this.sortIndex,
+      createdAt: createdAt ?? this.createdAt,
+      deletedAt: deletedAt ?? this.deletedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sortIndex.present) {
+      map['sort_index'] = Variable<int>(sortIndex.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProfilesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sortIndex: $sortIndex, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('deletedAt: $deletedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $CategoriesTable extends Categories
+    with TableInfo<$CategoriesTable, CategoryRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CategoriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _profileIdMeta = const VerificationMeta(
+    'profileId',
+  );
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+    'profile_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _numberMeta = const VerificationMeta('number');
+  @override
+  late final GeneratedColumn<int> number = GeneratedColumn<int>(
+    'number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isEditableMeta = const VerificationMeta(
+    'isEditable',
+  );
+  @override
+  late final GeneratedColumn<bool> isEditable = GeneratedColumn<bool>(
+    'is_editable',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_editable" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    profileId,
+    number,
+    name,
+    isEditable,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'categories';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CategoryRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(
+        _profileIdMeta,
+        profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta),
+      );
+    }
+    if (data.containsKey('number')) {
+      context.handle(
+        _numberMeta,
+        number.isAcceptableOrUnknown(data['number']!, _numberMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_numberMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    }
+    if (data.containsKey('is_editable')) {
+      context.handle(
+        _isEditableMeta,
+        isEditable.isAcceptableOrUnknown(data['is_editable']!, _isEditableMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CategoryRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CategoryRow(
+      id:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}id'],
+          )!,
+      profileId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}profile_id'],
+      ),
+      number:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.int,
+            data['${effectivePrefix}number'],
+          )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      ),
+      isEditable:
+          attachedDatabase.typeMapping.read(
+            DriftSqlType.bool,
+            data['${effectivePrefix}is_editable'],
+          )!,
+    );
+  }
+
+  @override
+  $CategoriesTable createAlias(String alias) {
+    return $CategoriesTable(attachedDatabase, alias);
+  }
+}
+
+class CategoryRow extends DataClass implements Insertable<CategoryRow> {
+  final int id;
+  final int? profileId;
+  final int number;
+  final String? name;
+  final bool isEditable;
+  const CategoryRow({
+    required this.id,
+    this.profileId,
+    required this.number,
+    this.name,
+    required this.isEditable,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || profileId != null) {
+      map['profile_id'] = Variable<int>(profileId);
+    }
+    map['number'] = Variable<int>(number);
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    map['is_editable'] = Variable<bool>(isEditable);
+    return map;
+  }
+
+  CategoriesCompanion toCompanion(bool nullToAbsent) {
+    return CategoriesCompanion(
+      id: Value(id),
+      profileId:
+          profileId == null && nullToAbsent
+              ? const Value.absent()
+              : Value(profileId),
+      number: Value(number),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      isEditable: Value(isEditable),
+    );
+  }
+
+  factory CategoryRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CategoryRow(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int?>(json['profileId']),
+      number: serializer.fromJson<int>(json['number']),
+      name: serializer.fromJson<String?>(json['name']),
+      isEditable: serializer.fromJson<bool>(json['isEditable']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int?>(profileId),
+      'number': serializer.toJson<int>(number),
+      'name': serializer.toJson<String?>(name),
+      'isEditable': serializer.toJson<bool>(isEditable),
+    };
+  }
+
+  CategoryRow copyWith({
+    int? id,
+    Value<int?> profileId = const Value.absent(),
+    int? number,
+    Value<String?> name = const Value.absent(),
+    bool? isEditable,
+  }) => CategoryRow(
+    id: id ?? this.id,
+    profileId: profileId.present ? profileId.value : this.profileId,
+    number: number ?? this.number,
+    name: name.present ? name.value : this.name,
+    isEditable: isEditable ?? this.isEditable,
+  );
+  CategoryRow copyWithCompanion(CategoriesCompanion data) {
+    return CategoryRow(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      number: data.number.present ? data.number.value : this.number,
+      name: data.name.present ? data.name.value : this.name,
+      isEditable:
+          data.isEditable.present ? data.isEditable.value : this.isEditable,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CategoryRow(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('number: $number, ')
+          ..write('name: $name, ')
+          ..write('isEditable: $isEditable')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, profileId, number, name, isEditable);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CategoryRow &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.number == this.number &&
+          other.name == this.name &&
+          other.isEditable == this.isEditable);
+}
+
+class CategoriesCompanion extends UpdateCompanion<CategoryRow> {
+  final Value<int> id;
+  final Value<int?> profileId;
+  final Value<int> number;
+  final Value<String?> name;
+  final Value<bool> isEditable;
+  const CategoriesCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.number = const Value.absent(),
+    this.name = const Value.absent(),
+    this.isEditable = const Value.absent(),
+  });
+  CategoriesCompanion.insert({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    required int number,
+    this.name = const Value.absent(),
+    this.isEditable = const Value.absent(),
+  }) : number = Value(number);
+  static Insertable<CategoryRow> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<int>? number,
+    Expression<String>? name,
+    Expression<bool>? isEditable,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (number != null) 'number': number,
+      if (name != null) 'name': name,
+      if (isEditable != null) 'is_editable': isEditable,
+    });
+  }
+
+  CategoriesCompanion copyWith({
+    Value<int>? id,
+    Value<int?>? profileId,
+    Value<int>? number,
+    Value<String?>? name,
+    Value<bool>? isEditable,
+  }) {
+    return CategoriesCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      number: number ?? this.number,
+      name: name ?? this.name,
+      isEditable: isEditable ?? this.isEditable,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (number.present) {
+      map['number'] = Variable<int>(number.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (isEditable.present) {
+      map['is_editable'] = Variable<bool>(isEditable.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CategoriesCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('number: $number, ')
+          ..write('name: $name, ')
+          ..write('isEditable: $isEditable')
           ..write(')'))
         .toString();
   }
@@ -750,9 +1557,6 @@ class $LinksTable extends Links with TableInfo<$LinksTable, Link> {
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
@@ -1261,9 +2065,6 @@ class $NotesTable extends Notes with TableInfo<$NotesTable, Note> {
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
@@ -1707,9 +2508,6 @@ class $EmailsTable extends Emails with TableInfo<$EmailsTable, Email> {
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _labelMeta = const VerificationMeta('label');
   @override
@@ -2218,9 +3016,6 @@ class $SubscriptionsTable extends Subscriptions
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _serviceNameMeta = const VerificationMeta(
     'serviceName',
@@ -2882,9 +3677,6 @@ class $PlatformsTable extends Platforms
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _platformNameMeta = const VerificationMeta(
     'platformName',
@@ -3397,9 +4189,6 @@ class $VariablesTable extends Variables
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _varKeyMeta = const VerificationMeta('varKey');
   @override
@@ -3905,9 +4694,6 @@ class $AlertsTable extends Alerts with TableInfo<$AlertsTable, Alert> {
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
   @override
@@ -4521,9 +5307,6 @@ class $OpenLogsTable extends OpenLogs with TableInfo<$OpenLogsTable, OpenLog> {
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES nodes (id)',
-    ),
   );
   static const VerificationMeta _openedAtMeta = const VerificationMeta(
     'openedAt',
@@ -4960,6 +5743,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $NodesTable nodes = $NodesTable(this);
+  late final $ProfilesTable profiles = $ProfilesTable(this);
+  late final $CategoriesTable categories = $CategoriesTable(this);
   late final $LinksTable links = $LinksTable(this);
   late final $NotesTable notes = $NotesTable(this);
   late final $EmailsTable emails = $EmailsTable(this);
@@ -4978,6 +5763,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     nodes,
+    profiles,
+    categories,
     links,
     notes,
     emails,
@@ -4994,6 +5781,8 @@ typedef $$NodesTableCreateCompanionBuilder =
     NodesCompanion Function({
       Value<int> id,
       Value<int?> parentId,
+      Value<int?> profileId,
+      Value<int?> categoryId,
       required String name,
       required NodeType type,
       Value<NodeTemplate?> template,
@@ -5009,6 +5798,8 @@ typedef $$NodesTableUpdateCompanionBuilder =
     NodesCompanion Function({
       Value<int> id,
       Value<int?> parentId,
+      Value<int?> profileId,
+      Value<int?> categoryId,
       Value<String> name,
       Value<NodeType> type,
       Value<NodeTemplate?> template,
@@ -5021,177 +5812,6 @@ typedef $$NodesTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$NodesTableReferences
-    extends BaseReferences<_$AppDatabase, $NodesTable, Node> {
-  $$NodesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _parentIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('nodes__parent_id__nodes__id');
-
-  $$NodesTableProcessedTableManager? get parentId {
-    final $_column = $_itemColumn<int>('parent_id');
-    if ($_column == null) return null;
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_parentIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<$LinksTable, List<Link>> _linksRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.links,
-    aliasName: 'nodes__id__links__node_id',
-  );
-
-  $$LinksTableProcessedTableManager get linksRefs {
-    final manager = $$LinksTableTableManager(
-      $_db,
-      $_db.links,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_linksRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$NotesTable, List<Note>> _notesRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.notes,
-    aliasName: 'nodes__id__notes__node_id',
-  );
-
-  $$NotesTableProcessedTableManager get notesRefs {
-    final manager = $$NotesTableTableManager(
-      $_db,
-      $_db.notes,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_notesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$EmailsTable, List<Email>> _emailsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.emails,
-    aliasName: 'nodes__id__emails__node_id',
-  );
-
-  $$EmailsTableProcessedTableManager get emailsRefs {
-    final manager = $$EmailsTableTableManager(
-      $_db,
-      $_db.emails,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_emailsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$SubscriptionsTable, List<Subscription>>
-  _subscriptionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.subscriptions,
-    aliasName: 'nodes__id__subscriptions__node_id',
-  );
-
-  $$SubscriptionsTableProcessedTableManager get subscriptionsRefs {
-    final manager = $$SubscriptionsTableTableManager(
-      $_db,
-      $_db.subscriptions,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_subscriptionsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$PlatformsTable, List<PlatformRow>>
-  _platformsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.platforms,
-    aliasName: 'nodes__id__platforms__node_id',
-  );
-
-  $$PlatformsTableProcessedTableManager get platformsRefs {
-    final manager = $$PlatformsTableTableManager(
-      $_db,
-      $_db.platforms,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_platformsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$VariablesTable, List<VariableRow>>
-  _variablesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.variables,
-    aliasName: 'nodes__id__variables__node_id',
-  );
-
-  $$VariablesTableProcessedTableManager get variablesRefs {
-    final manager = $$VariablesTableTableManager(
-      $_db,
-      $_db.variables,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_variablesRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$AlertsTable, List<Alert>> _alertsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.alerts,
-    aliasName: 'nodes__id__alerts__node_id',
-  );
-
-  $$AlertsTableProcessedTableManager get alertsRefs {
-    final manager = $$AlertsTableTableManager(
-      $_db,
-      $_db.alerts,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_alertsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$OpenLogsTable, List<OpenLog>> _openLogsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.openLogs,
-    aliasName: 'nodes__id__open_logs__node_id',
-  );
-
-  $$OpenLogsTableProcessedTableManager get openLogsRefs {
-    final manager = $$OpenLogsTableTableManager(
-      $_db,
-      $_db.openLogs,
-    ).filter((f) => f.nodeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_openLogsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
 class $$NodesTableFilterComposer extends Composer<_$AppDatabase, $NodesTable> {
   $$NodesTableFilterComposer({
     required super.$db,
@@ -5202,6 +5822,21 @@ class $$NodesTableFilterComposer extends Composer<_$AppDatabase, $NodesTable> {
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get profileId => $composableBuilder(
+    column: $table.profileId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get categoryId => $composableBuilder(
+    column: $table.categoryId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5257,229 +5892,6 @@ class $$NodesTableFilterComposer extends Composer<_$AppDatabase, $NodesTable> {
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get parentId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.parentId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<bool> linksRefs(
-    Expression<bool> Function($$LinksTableFilterComposer f) f,
-  ) {
-    final $$LinksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.links,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$LinksTableFilterComposer(
-            $db: $db,
-            $table: $db.links,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> notesRefs(
-    Expression<bool> Function($$NotesTableFilterComposer f) f,
-  ) {
-    final $$NotesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.notes,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NotesTableFilterComposer(
-            $db: $db,
-            $table: $db.notes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> emailsRefs(
-    Expression<bool> Function($$EmailsTableFilterComposer f) f,
-  ) {
-    final $$EmailsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.emails,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EmailsTableFilterComposer(
-            $db: $db,
-            $table: $db.emails,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> subscriptionsRefs(
-    Expression<bool> Function($$SubscriptionsTableFilterComposer f) f,
-  ) {
-    final $$SubscriptionsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.subscriptions,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$SubscriptionsTableFilterComposer(
-            $db: $db,
-            $table: $db.subscriptions,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> platformsRefs(
-    Expression<bool> Function($$PlatformsTableFilterComposer f) f,
-  ) {
-    final $$PlatformsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.platforms,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PlatformsTableFilterComposer(
-            $db: $db,
-            $table: $db.platforms,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> variablesRefs(
-    Expression<bool> Function($$VariablesTableFilterComposer f) f,
-  ) {
-    final $$VariablesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.variables,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$VariablesTableFilterComposer(
-            $db: $db,
-            $table: $db.variables,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> alertsRefs(
-    Expression<bool> Function($$AlertsTableFilterComposer f) f,
-  ) {
-    final $$AlertsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.alerts,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$AlertsTableFilterComposer(
-            $db: $db,
-            $table: $db.alerts,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> openLogsRefs(
-    Expression<bool> Function($$OpenLogsTableFilterComposer f) f,
-  ) {
-    final $$OpenLogsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.openLogs,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$OpenLogsTableFilterComposer(
-            $db: $db,
-            $table: $db.openLogs,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$NodesTableOrderingComposer
@@ -5493,6 +5905,21 @@ class $$NodesTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get parentId => $composableBuilder(
+    column: $table.parentId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get profileId => $composableBuilder(
+    column: $table.profileId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get categoryId => $composableBuilder(
+    column: $table.categoryId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -5545,29 +5972,6 @@ class $$NodesTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get parentId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.parentId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$NodesTableAnnotationComposer
@@ -5581,6 +5985,17 @@ class $$NodesTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get parentId =>
+      $composableBuilder(column: $table.parentId, builder: (column) => column);
+
+  GeneratedColumn<int> get profileId =>
+      $composableBuilder(column: $table.profileId, builder: (column) => column);
+
+  GeneratedColumn<int> get categoryId => $composableBuilder(
+    column: $table.categoryId,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get name =>
       $composableBuilder(column: $table.name, builder: (column) => column);
@@ -5613,229 +6028,6 @@ class $$NodesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get parentId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.parentId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<T> linksRefs<T extends Object>(
-    Expression<T> Function($$LinksTableAnnotationComposer a) f,
-  ) {
-    final $$LinksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.links,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$LinksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.links,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> notesRefs<T extends Object>(
-    Expression<T> Function($$NotesTableAnnotationComposer a) f,
-  ) {
-    final $$NotesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.notes,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NotesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.notes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> emailsRefs<T extends Object>(
-    Expression<T> Function($$EmailsTableAnnotationComposer a) f,
-  ) {
-    final $$EmailsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.emails,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$EmailsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.emails,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> subscriptionsRefs<T extends Object>(
-    Expression<T> Function($$SubscriptionsTableAnnotationComposer a) f,
-  ) {
-    final $$SubscriptionsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.subscriptions,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$SubscriptionsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.subscriptions,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> platformsRefs<T extends Object>(
-    Expression<T> Function($$PlatformsTableAnnotationComposer a) f,
-  ) {
-    final $$PlatformsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.platforms,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PlatformsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.platforms,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> variablesRefs<T extends Object>(
-    Expression<T> Function($$VariablesTableAnnotationComposer a) f,
-  ) {
-    final $$VariablesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.variables,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$VariablesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.variables,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> alertsRefs<T extends Object>(
-    Expression<T> Function($$AlertsTableAnnotationComposer a) f,
-  ) {
-    final $$AlertsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.alerts,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$AlertsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.alerts,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> openLogsRefs<T extends Object>(
-    Expression<T> Function($$OpenLogsTableAnnotationComposer a) f,
-  ) {
-    final $$OpenLogsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.openLogs,
-      getReferencedColumn: (t) => t.nodeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$OpenLogsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.openLogs,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$NodesTableTableManager
@@ -5849,19 +6041,9 @@ class $$NodesTableTableManager
           $$NodesTableAnnotationComposer,
           $$NodesTableCreateCompanionBuilder,
           $$NodesTableUpdateCompanionBuilder,
-          (Node, $$NodesTableReferences),
+          (Node, BaseReferences<_$AppDatabase, $NodesTable, Node>),
           Node,
-          PrefetchHooks Function({
-            bool parentId,
-            bool linksRefs,
-            bool notesRefs,
-            bool emailsRefs,
-            bool subscriptionsRefs,
-            bool platformsRefs,
-            bool variablesRefs,
-            bool alertsRefs,
-            bool openLogsRefs,
-          })
+          PrefetchHooks Function()
         > {
   $$NodesTableTableManager(_$AppDatabase db, $NodesTable table)
     : super(
@@ -5878,6 +6060,8 @@ class $$NodesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> parentId = const Value.absent(),
+                Value<int?> profileId = const Value.absent(),
+                Value<int?> categoryId = const Value.absent(),
                 Value<String> name = const Value.absent(),
                 Value<NodeType> type = const Value.absent(),
                 Value<NodeTemplate?> template = const Value.absent(),
@@ -5891,6 +6075,8 @@ class $$NodesTableTableManager
               }) => NodesCompanion(
                 id: id,
                 parentId: parentId,
+                profileId: profileId,
+                categoryId: categoryId,
                 name: name,
                 type: type,
                 template: template,
@@ -5906,6 +6092,8 @@ class $$NodesTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int?> parentId = const Value.absent(),
+                Value<int?> profileId = const Value.absent(),
+                Value<int?> categoryId = const Value.absent(),
                 required String name,
                 required NodeType type,
                 Value<NodeTemplate?> template = const Value.absent(),
@@ -5919,6 +6107,8 @@ class $$NodesTableTableManager
               }) => NodesCompanion.insert(
                 id: id,
                 parentId: parentId,
+                profileId: profileId,
+                categoryId: categoryId,
                 name: name,
                 type: type,
                 template: template,
@@ -5935,194 +6125,12 @@ class $$NodesTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$NodesTable, Node>(table),
-                          $$NodesTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({
-            parentId = false,
-            linksRefs = false,
-            notesRefs = false,
-            emailsRefs = false,
-            subscriptionsRefs = false,
-            platformsRefs = false,
-            variablesRefs = false,
-            alertsRefs = false,
-            openLogsRefs = false,
-          }) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (linksRefs) db.links,
-                if (notesRefs) db.notes,
-                if (emailsRefs) db.emails,
-                if (subscriptionsRefs) db.subscriptions,
-                if (platformsRefs) db.platforms,
-                if (variablesRefs) db.variables,
-                if (alertsRefs) db.alerts,
-                if (openLogsRefs) db.openLogs,
-              ],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (parentId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.parentId,
-                            referencedTable: $$NodesTableReferences
-                                ._parentIdTable(db),
-                            referencedColumn:
-                                $$NodesTableReferences._parentIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (linksRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, Link>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences._linksRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(db, table, p0).linksRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (notesRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, Note>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences._notesRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(db, table, p0).notesRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (emailsRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, Email>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences._emailsRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(db, table, p0).emailsRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (subscriptionsRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, Subscription>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences
-                          ._subscriptionsRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).subscriptionsRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (platformsRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, PlatformRow>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences
-                          ._platformsRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).platformsRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (variablesRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, VariableRow>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences
-                          ._variablesRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).variablesRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (alertsRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, Alert>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences._alertsRefsTable(
-                        db,
-                      ),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(db, table, p0).alertsRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                  if (openLogsRefs)
-                    await $_getPrefetchedData<Node, $NodesTable, OpenLog>(
-                      currentTable: table,
-                      referencedTable: $$NodesTableReferences
-                          ._openLogsRefsTable(db),
-                      managerFromTypedResult:
-                          (p0) =>
-                              $$NodesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).openLogsRefs,
-                      referencedItemsForCurrentItem:
-                          (item, referencedItems) =>
-                              referencedItems.where((e) => e.nodeId == item.id),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -6137,19 +6145,407 @@ typedef $$NodesTableProcessedTableManager =
       $$NodesTableAnnotationComposer,
       $$NodesTableCreateCompanionBuilder,
       $$NodesTableUpdateCompanionBuilder,
-      (Node, $$NodesTableReferences),
+      (Node, BaseReferences<_$AppDatabase, $NodesTable, Node>),
       Node,
-      PrefetchHooks Function({
-        bool parentId,
-        bool linksRefs,
-        bool notesRefs,
-        bool emailsRefs,
-        bool subscriptionsRefs,
-        bool platformsRefs,
-        bool variablesRefs,
-        bool alertsRefs,
-        bool openLogsRefs,
-      })
+      PrefetchHooks Function()
+    >;
+typedef $$ProfilesTableCreateCompanionBuilder =
+    ProfilesCompanion Function({
+      Value<int> id,
+      required String name,
+      Value<int> sortIndex,
+      Value<DateTime> createdAt,
+      Value<DateTime?> deletedAt,
+    });
+typedef $$ProfilesTableUpdateCompanionBuilder =
+    ProfilesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<int> sortIndex,
+      Value<DateTime> createdAt,
+      Value<DateTime?> deletedAt,
+    });
+
+class $$ProfilesTableFilterComposer
+    extends Composer<_$AppDatabase, $ProfilesTable> {
+  $$ProfilesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortIndex => $composableBuilder(
+    column: $table.sortIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ProfilesTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProfilesTable> {
+  $$ProfilesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortIndex => $composableBuilder(
+    column: $table.sortIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ProfilesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProfilesTable> {
+  $$ProfilesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sortIndex =>
+      $composableBuilder(column: $table.sortIndex, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+}
+
+class $$ProfilesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProfilesTable,
+          Profile,
+          $$ProfilesTableFilterComposer,
+          $$ProfilesTableOrderingComposer,
+          $$ProfilesTableAnnotationComposer,
+          $$ProfilesTableCreateCompanionBuilder,
+          $$ProfilesTableUpdateCompanionBuilder,
+          (Profile, BaseReferences<_$AppDatabase, $ProfilesTable, Profile>),
+          Profile,
+          PrefetchHooks Function()
+        > {
+  $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$ProfilesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$ProfilesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$ProfilesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sortIndex = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ProfilesCompanion(
+                id: id,
+                name: name,
+                sortIndex: sortIndex,
+                createdAt: createdAt,
+                deletedAt: deletedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                Value<int> sortIndex = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+              }) => ProfilesCompanion.insert(
+                id: id,
+                name: name,
+                sortIndex: sortIndex,
+                createdAt: createdAt,
+                deletedAt: deletedAt,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ProfilesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProfilesTable,
+      Profile,
+      $$ProfilesTableFilterComposer,
+      $$ProfilesTableOrderingComposer,
+      $$ProfilesTableAnnotationComposer,
+      $$ProfilesTableCreateCompanionBuilder,
+      $$ProfilesTableUpdateCompanionBuilder,
+      (Profile, BaseReferences<_$AppDatabase, $ProfilesTable, Profile>),
+      Profile,
+      PrefetchHooks Function()
+    >;
+typedef $$CategoriesTableCreateCompanionBuilder =
+    CategoriesCompanion Function({
+      Value<int> id,
+      Value<int?> profileId,
+      required int number,
+      Value<String?> name,
+      Value<bool> isEditable,
+    });
+typedef $$CategoriesTableUpdateCompanionBuilder =
+    CategoriesCompanion Function({
+      Value<int> id,
+      Value<int?> profileId,
+      Value<int> number,
+      Value<String?> name,
+      Value<bool> isEditable,
+    });
+
+class $$CategoriesTableFilterComposer
+    extends Composer<_$AppDatabase, $CategoriesTable> {
+  $$CategoriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get profileId => $composableBuilder(
+    column: $table.profileId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get number => $composableBuilder(
+    column: $table.number,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isEditable => $composableBuilder(
+    column: $table.isEditable,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$CategoriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $CategoriesTable> {
+  $$CategoriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get profileId => $composableBuilder(
+    column: $table.profileId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get number => $composableBuilder(
+    column: $table.number,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isEditable => $composableBuilder(
+    column: $table.isEditable,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$CategoriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CategoriesTable> {
+  $$CategoriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get profileId =>
+      $composableBuilder(column: $table.profileId, builder: (column) => column);
+
+  GeneratedColumn<int> get number =>
+      $composableBuilder(column: $table.number, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<bool> get isEditable => $composableBuilder(
+    column: $table.isEditable,
+    builder: (column) => column,
+  );
+}
+
+class $$CategoriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CategoriesTable,
+          CategoryRow,
+          $$CategoriesTableFilterComposer,
+          $$CategoriesTableOrderingComposer,
+          $$CategoriesTableAnnotationComposer,
+          $$CategoriesTableCreateCompanionBuilder,
+          $$CategoriesTableUpdateCompanionBuilder,
+          (
+            CategoryRow,
+            BaseReferences<_$AppDatabase, $CategoriesTable, CategoryRow>,
+          ),
+          CategoryRow,
+          PrefetchHooks Function()
+        > {
+  $$CategoriesTableTableManager(_$AppDatabase db, $CategoriesTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer:
+              () => $$CategoriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer:
+              () => $$CategoriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer:
+              () => $$CategoriesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> profileId = const Value.absent(),
+                Value<int> number = const Value.absent(),
+                Value<String?> name = const Value.absent(),
+                Value<bool> isEditable = const Value.absent(),
+              }) => CategoriesCompanion(
+                id: id,
+                profileId: profileId,
+                number: number,
+                name: name,
+                isEditable: isEditable,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int?> profileId = const Value.absent(),
+                required int number,
+                Value<String?> name = const Value.absent(),
+                Value<bool> isEditable = const Value.absent(),
+              }) => CategoriesCompanion.insert(
+                id: id,
+                profileId: profileId,
+                number: number,
+                name: name,
+                isEditable: isEditable,
+              ),
+          withReferenceMapper:
+              (p0) =>
+                  p0
+                      .map(
+                        (e) => (
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
+                        ),
+                      )
+                      .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$CategoriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CategoriesTable,
+      CategoryRow,
+      $$CategoriesTableFilterComposer,
+      $$CategoriesTableOrderingComposer,
+      $$CategoriesTableAnnotationComposer,
+      $$CategoriesTableCreateCompanionBuilder,
+      $$CategoriesTableUpdateCompanionBuilder,
+      (
+        CategoryRow,
+        BaseReferences<_$AppDatabase, $CategoriesTable, CategoryRow>,
+      ),
+      CategoryRow,
+      PrefetchHooks Function()
     >;
 typedef $$LinksTableCreateCompanionBuilder =
     LinksCompanion Function({
@@ -6174,28 +6570,6 @@ typedef $$LinksTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$LinksTableReferences
-    extends BaseReferences<_$AppDatabase, $LinksTable, Link> {
-  $$LinksTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('links__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$LinksTableFilterComposer extends Composer<_$AppDatabase, $LinksTable> {
   $$LinksTableFilterComposer({
     required super.$db,
@@ -6206,6 +6580,11 @@ class $$LinksTableFilterComposer extends Composer<_$AppDatabase, $LinksTable> {
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6239,29 +6618,6 @@ class $$LinksTableFilterComposer extends Composer<_$AppDatabase, $LinksTable> {
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$LinksTableOrderingComposer
@@ -6275,6 +6631,11 @@ class $$LinksTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6307,29 +6668,6 @@ class $$LinksTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$LinksTableAnnotationComposer
@@ -6343,6 +6681,9 @@ class $$LinksTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
@@ -6361,29 +6702,6 @@ class $$LinksTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$LinksTableTableManager
@@ -6397,9 +6715,9 @@ class $$LinksTableTableManager
           $$LinksTableAnnotationComposer,
           $$LinksTableCreateCompanionBuilder,
           $$LinksTableUpdateCompanionBuilder,
-          (Link, $$LinksTableReferences),
+          (Link, BaseReferences<_$AppDatabase, $LinksTable, Link>),
           Link,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$LinksTableTableManager(_$AppDatabase db, $LinksTable table)
     : super(
@@ -6457,50 +6775,12 @@ class $$LinksTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$LinksTable, Link>(table),
-                          $$LinksTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$LinksTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$LinksTableReferences._nodeIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -6515,9 +6795,9 @@ typedef $$LinksTableProcessedTableManager =
       $$LinksTableAnnotationComposer,
       $$LinksTableCreateCompanionBuilder,
       $$LinksTableUpdateCompanionBuilder,
-      (Link, $$LinksTableReferences),
+      (Link, BaseReferences<_$AppDatabase, $LinksTable, Link>),
       Link,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$NotesTableCreateCompanionBuilder =
     NotesCompanion Function({
@@ -6540,28 +6820,6 @@ typedef $$NotesTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$NotesTableReferences
-    extends BaseReferences<_$AppDatabase, $NotesTable, Note> {
-  $$NotesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('notes__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
   $$NotesTableFilterComposer({
     required super.$db,
@@ -6572,6 +6830,11 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6599,29 +6862,6 @@ class $$NotesTableFilterComposer extends Composer<_$AppDatabase, $NotesTable> {
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$NotesTableOrderingComposer
@@ -6635,6 +6875,11 @@ class $$NotesTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -6662,29 +6907,6 @@ class $$NotesTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$NotesTableAnnotationComposer
@@ -6698,6 +6920,9 @@ class $$NotesTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
@@ -6713,29 +6938,6 @@ class $$NotesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$NotesTableTableManager
@@ -6749,9 +6951,9 @@ class $$NotesTableTableManager
           $$NotesTableAnnotationComposer,
           $$NotesTableCreateCompanionBuilder,
           $$NotesTableUpdateCompanionBuilder,
-          (Note, $$NotesTableReferences),
+          (Note, BaseReferences<_$AppDatabase, $NotesTable, Note>),
           Note,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$NotesTableTableManager(_$AppDatabase db, $NotesTable table)
     : super(
@@ -6805,50 +7007,12 @@ class $$NotesTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$NotesTable, Note>(table),
-                          $$NotesTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$NotesTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$NotesTableReferences._nodeIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -6863,9 +7027,9 @@ typedef $$NotesTableProcessedTableManager =
       $$NotesTableAnnotationComposer,
       $$NotesTableCreateCompanionBuilder,
       $$NotesTableUpdateCompanionBuilder,
-      (Note, $$NotesTableReferences),
+      (Note, BaseReferences<_$AppDatabase, $NotesTable, Note>),
       Note,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$EmailsTableCreateCompanionBuilder =
     EmailsCompanion Function({
@@ -6890,28 +7054,6 @@ typedef $$EmailsTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$EmailsTableReferences
-    extends BaseReferences<_$AppDatabase, $EmailsTable, Email> {
-  $$EmailsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('emails__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$EmailsTableFilterComposer
     extends Composer<_$AppDatabase, $EmailsTable> {
   $$EmailsTableFilterComposer({
@@ -6923,6 +7065,11 @@ class $$EmailsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -6955,29 +7102,6 @@ class $$EmailsTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$EmailsTableOrderingComposer
@@ -6991,6 +7115,11 @@ class $$EmailsTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -7023,29 +7152,6 @@ class $$EmailsTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$EmailsTableAnnotationComposer
@@ -7059,6 +7165,9 @@ class $$EmailsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
 
   GeneratedColumn<String> get label =>
       $composableBuilder(column: $table.label, builder: (column) => column);
@@ -7077,29 +7186,6 @@ class $$EmailsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$EmailsTableTableManager
@@ -7113,9 +7199,9 @@ class $$EmailsTableTableManager
           $$EmailsTableAnnotationComposer,
           $$EmailsTableCreateCompanionBuilder,
           $$EmailsTableUpdateCompanionBuilder,
-          (Email, $$EmailsTableReferences),
+          (Email, BaseReferences<_$AppDatabase, $EmailsTable, Email>),
           Email,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$EmailsTableTableManager(_$AppDatabase db, $EmailsTable table)
     : super(
@@ -7173,50 +7259,12 @@ class $$EmailsTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$EmailsTable, Email>(table),
-                          $$EmailsTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$EmailsTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$EmailsTableReferences._nodeIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -7231,9 +7279,9 @@ typedef $$EmailsTableProcessedTableManager =
       $$EmailsTableAnnotationComposer,
       $$EmailsTableCreateCompanionBuilder,
       $$EmailsTableUpdateCompanionBuilder,
-      (Email, $$EmailsTableReferences),
+      (Email, BaseReferences<_$AppDatabase, $EmailsTable, Email>),
       Email,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$SubscriptionsTableCreateCompanionBuilder =
     SubscriptionsCompanion Function({
@@ -7264,32 +7312,6 @@ typedef $$SubscriptionsTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$SubscriptionsTableReferences
-    extends BaseReferences<_$AppDatabase, $SubscriptionsTable, Subscription> {
-  $$SubscriptionsTableReferences(
-    super.$_db,
-    super.$_table,
-    super.$_typedResult,
-  );
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('subscriptions__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$SubscriptionsTableFilterComposer
     extends Composer<_$AppDatabase, $SubscriptionsTable> {
   $$SubscriptionsTableFilterComposer({
@@ -7301,6 +7323,11 @@ class $$SubscriptionsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7350,29 +7377,6 @@ class $$SubscriptionsTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$SubscriptionsTableOrderingComposer
@@ -7386,6 +7390,11 @@ class $$SubscriptionsTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -7433,29 +7442,6 @@ class $$SubscriptionsTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$SubscriptionsTableAnnotationComposer
@@ -7469,6 +7455,9 @@ class $$SubscriptionsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
 
   GeneratedColumn<String> get serviceName => $composableBuilder(
     column: $table.serviceName,
@@ -7498,29 +7487,6 @@ class $$SubscriptionsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$SubscriptionsTableTableManager
@@ -7534,9 +7500,12 @@ class $$SubscriptionsTableTableManager
           $$SubscriptionsTableAnnotationComposer,
           $$SubscriptionsTableCreateCompanionBuilder,
           $$SubscriptionsTableUpdateCompanionBuilder,
-          (Subscription, $$SubscriptionsTableReferences),
+          (
+            Subscription,
+            BaseReferences<_$AppDatabase, $SubscriptionsTable, Subscription>,
+          ),
           Subscription,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$SubscriptionsTableTableManager(_$AppDatabase db, $SubscriptionsTable table)
     : super(
@@ -7610,52 +7579,12 @@ class $$SubscriptionsTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$SubscriptionsTable, Subscription>(table),
-                          $$SubscriptionsTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$SubscriptionsTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$SubscriptionsTableReferences
-                                    ._nodeIdTable(db)
-                                    .id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -7670,9 +7599,12 @@ typedef $$SubscriptionsTableProcessedTableManager =
       $$SubscriptionsTableAnnotationComposer,
       $$SubscriptionsTableCreateCompanionBuilder,
       $$SubscriptionsTableUpdateCompanionBuilder,
-      (Subscription, $$SubscriptionsTableReferences),
+      (
+        Subscription,
+        BaseReferences<_$AppDatabase, $SubscriptionsTable, Subscription>,
+      ),
       Subscription,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$PlatformsTableCreateCompanionBuilder =
     PlatformsCompanion Function({
@@ -7697,28 +7629,6 @@ typedef $$PlatformsTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$PlatformsTableReferences
-    extends BaseReferences<_$AppDatabase, $PlatformsTable, PlatformRow> {
-  $$PlatformsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('platforms__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$PlatformsTableFilterComposer
     extends Composer<_$AppDatabase, $PlatformsTable> {
   $$PlatformsTableFilterComposer({
@@ -7730,6 +7640,11 @@ class $$PlatformsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -7762,29 +7677,6 @@ class $$PlatformsTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PlatformsTableOrderingComposer
@@ -7798,6 +7690,11 @@ class $$PlatformsTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -7830,29 +7727,6 @@ class $$PlatformsTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PlatformsTableAnnotationComposer
@@ -7866,6 +7740,9 @@ class $$PlatformsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
 
   GeneratedColumn<String> get platformName => $composableBuilder(
     column: $table.platformName,
@@ -7886,29 +7763,6 @@ class $$PlatformsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PlatformsTableTableManager
@@ -7922,9 +7776,12 @@ class $$PlatformsTableTableManager
           $$PlatformsTableAnnotationComposer,
           $$PlatformsTableCreateCompanionBuilder,
           $$PlatformsTableUpdateCompanionBuilder,
-          (PlatformRow, $$PlatformsTableReferences),
+          (
+            PlatformRow,
+            BaseReferences<_$AppDatabase, $PlatformsTable, PlatformRow>,
+          ),
           PlatformRow,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$PlatformsTableTableManager(_$AppDatabase db, $PlatformsTable table)
     : super(
@@ -7982,50 +7839,12 @@ class $$PlatformsTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$PlatformsTable, PlatformRow>(table),
-                          $$PlatformsTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$PlatformsTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$PlatformsTableReferences._nodeIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -8040,9 +7859,12 @@ typedef $$PlatformsTableProcessedTableManager =
       $$PlatformsTableAnnotationComposer,
       $$PlatformsTableCreateCompanionBuilder,
       $$PlatformsTableUpdateCompanionBuilder,
-      (PlatformRow, $$PlatformsTableReferences),
+      (
+        PlatformRow,
+        BaseReferences<_$AppDatabase, $PlatformsTable, PlatformRow>,
+      ),
       PlatformRow,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$VariablesTableCreateCompanionBuilder =
     VariablesCompanion Function({
@@ -8067,28 +7889,6 @@ typedef $$VariablesTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$VariablesTableReferences
-    extends BaseReferences<_$AppDatabase, $VariablesTable, VariableRow> {
-  $$VariablesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('variables__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$VariablesTableFilterComposer
     extends Composer<_$AppDatabase, $VariablesTable> {
   $$VariablesTableFilterComposer({
@@ -8100,6 +7900,11 @@ class $$VariablesTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8132,29 +7937,6 @@ class $$VariablesTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$VariablesTableOrderingComposer
@@ -8168,6 +7950,11 @@ class $$VariablesTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -8200,29 +7987,6 @@ class $$VariablesTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$VariablesTableAnnotationComposer
@@ -8236,6 +8000,9 @@ class $$VariablesTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
 
   GeneratedColumn<String> get varKey =>
       $composableBuilder(column: $table.varKey, builder: (column) => column);
@@ -8254,29 +8021,6 @@ class $$VariablesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$VariablesTableTableManager
@@ -8290,9 +8034,12 @@ class $$VariablesTableTableManager
           $$VariablesTableAnnotationComposer,
           $$VariablesTableCreateCompanionBuilder,
           $$VariablesTableUpdateCompanionBuilder,
-          (VariableRow, $$VariablesTableReferences),
+          (
+            VariableRow,
+            BaseReferences<_$AppDatabase, $VariablesTable, VariableRow>,
+          ),
           VariableRow,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$VariablesTableTableManager(_$AppDatabase db, $VariablesTable table)
     : super(
@@ -8350,50 +8097,12 @@ class $$VariablesTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$VariablesTable, VariableRow>(table),
-                          $$VariablesTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$VariablesTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$VariablesTableReferences._nodeIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -8408,9 +8117,12 @@ typedef $$VariablesTableProcessedTableManager =
       $$VariablesTableAnnotationComposer,
       $$VariablesTableCreateCompanionBuilder,
       $$VariablesTableUpdateCompanionBuilder,
-      (VariableRow, $$VariablesTableReferences),
+      (
+        VariableRow,
+        BaseReferences<_$AppDatabase, $VariablesTable, VariableRow>,
+      ),
       VariableRow,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$AlertsTableCreateCompanionBuilder =
     AlertsCompanion Function({
@@ -8439,28 +8151,6 @@ typedef $$AlertsTableUpdateCompanionBuilder =
       Value<DateTime?> deletedAt,
     });
 
-final class $$AlertsTableReferences
-    extends BaseReferences<_$AppDatabase, $AlertsTable, Alert> {
-  $$AlertsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('alerts__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
 class $$AlertsTableFilterComposer
     extends Composer<_$AppDatabase, $AlertsTable> {
   $$AlertsTableFilterComposer({
@@ -8472,6 +8162,11 @@ class $$AlertsTableFilterComposer
   });
   ColumnFilters<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -8514,29 +8209,6 @@ class $$AlertsTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$AlertsTableOrderingComposer
@@ -8550,6 +8222,11 @@ class $$AlertsTableOrderingComposer
   });
   ColumnOrderings<int> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -8592,29 +8269,6 @@ class $$AlertsTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$AlertsTableAnnotationComposer
@@ -8628,6 +8282,9 @@ class $$AlertsTableAnnotationComposer
   });
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
 
   GeneratedColumn<String> get title =>
       $composableBuilder(column: $table.title, builder: (column) => column);
@@ -8654,29 +8311,6 @@ class $$AlertsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$AlertsTableTableManager
@@ -8690,9 +8324,9 @@ class $$AlertsTableTableManager
           $$AlertsTableAnnotationComposer,
           $$AlertsTableCreateCompanionBuilder,
           $$AlertsTableUpdateCompanionBuilder,
-          (Alert, $$AlertsTableReferences),
+          (Alert, BaseReferences<_$AppDatabase, $AlertsTable, Alert>),
           Alert,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$AlertsTableTableManager(_$AppDatabase db, $AlertsTable table)
     : super(
@@ -8758,50 +8392,12 @@ class $$AlertsTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$AlertsTable, Alert>(table),
-                          $$AlertsTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$AlertsTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$AlertsTableReferences._nodeIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -8816,9 +8412,9 @@ typedef $$AlertsTableProcessedTableManager =
       $$AlertsTableAnnotationComposer,
       $$AlertsTableCreateCompanionBuilder,
       $$AlertsTableUpdateCompanionBuilder,
-      (Alert, $$AlertsTableReferences),
+      (Alert, BaseReferences<_$AppDatabase, $AlertsTable, Alert>),
       Alert,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$OpenLogsTableCreateCompanionBuilder =
     OpenLogsCompanion Function({
@@ -8832,28 +8428,6 @@ typedef $$OpenLogsTableUpdateCompanionBuilder =
       Value<int> nodeId,
       Value<DateTime> openedAt,
     });
-
-final class $$OpenLogsTableReferences
-    extends BaseReferences<_$AppDatabase, $OpenLogsTable, OpenLog> {
-  $$OpenLogsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $NodesTable _nodeIdTable(_$AppDatabase db) =>
-      db.nodes.createAlias('open_logs__node_id__nodes__id');
-
-  $$NodesTableProcessedTableManager get nodeId {
-    final $_column = $_itemColumn<int>('node_id')!;
-
-    final manager = $$NodesTableTableManager(
-      $_db,
-      $_db.nodes,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_nodeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
 
 class $$OpenLogsTableFilterComposer
     extends Composer<_$AppDatabase, $OpenLogsTable> {
@@ -8869,33 +8443,15 @@ class $$OpenLogsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<DateTime> get openedAt => $composableBuilder(
     column: $table.openedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$NodesTableFilterComposer get nodeId {
-    final $$NodesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableFilterComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$OpenLogsTableOrderingComposer
@@ -8912,33 +8468,15 @@ class $$OpenLogsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get nodeId => $composableBuilder(
+    column: $table.nodeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get openedAt => $composableBuilder(
     column: $table.openedAt,
     builder: (column) => ColumnOrderings(column),
   );
-
-  $$NodesTableOrderingComposer get nodeId {
-    final $$NodesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableOrderingComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$OpenLogsTableAnnotationComposer
@@ -8953,31 +8491,11 @@ class $$OpenLogsTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
+  GeneratedColumn<int> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
+
   GeneratedColumn<DateTime> get openedAt =>
       $composableBuilder(column: $table.openedAt, builder: (column) => column);
-
-  $$NodesTableAnnotationComposer get nodeId {
-    final $$NodesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.nodeId,
-      referencedTable: $db.nodes,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$NodesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.nodes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$OpenLogsTableTableManager
@@ -8991,9 +8509,9 @@ class $$OpenLogsTableTableManager
           $$OpenLogsTableAnnotationComposer,
           $$OpenLogsTableCreateCompanionBuilder,
           $$OpenLogsTableUpdateCompanionBuilder,
-          (OpenLog, $$OpenLogsTableReferences),
+          (OpenLog, BaseReferences<_$AppDatabase, $OpenLogsTable, OpenLog>),
           OpenLog,
-          PrefetchHooks Function({bool nodeId})
+          PrefetchHooks Function()
         > {
   $$OpenLogsTableTableManager(_$AppDatabase db, $OpenLogsTable table)
     : super(
@@ -9028,50 +8546,12 @@ class $$OpenLogsTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$OpenLogsTable, OpenLog>(table),
-                          $$OpenLogsTableReferences(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
-          prefetchHooksCallback: ({nodeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins: <
-                T extends TableManagerState<
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic,
-                  dynamic
-                >
-              >(state) {
-                if (nodeId) {
-                  state =
-                      state.withJoin(
-                            currentTable: table,
-                            currentColumn: table.nodeId,
-                            referencedTable: $$OpenLogsTableReferences
-                                ._nodeIdTable(db),
-                            referencedColumn:
-                                $$OpenLogsTableReferences._nodeIdTable(db).id,
-                          )
-                          as T;
-                }
-
-                return state;
-              },
-              getPrefetchedDataCallback: (items) async {
-                return [];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -9086,9 +8566,9 @@ typedef $$OpenLogsTableProcessedTableManager =
       $$OpenLogsTableAnnotationComposer,
       $$OpenLogsTableCreateCompanionBuilder,
       $$OpenLogsTableUpdateCompanionBuilder,
-      (OpenLog, $$OpenLogsTableReferences),
+      (OpenLog, BaseReferences<_$AppDatabase, $OpenLogsTable, OpenLog>),
       OpenLog,
-      PrefetchHooks Function({bool nodeId})
+      PrefetchHooks Function()
     >;
 typedef $$AppSettingsTableCreateCompanionBuilder =
     AppSettingsCompanion Function({
@@ -9210,12 +8690,8 @@ class $$AppSettingsTableTableManager
                   p0
                       .map(
                         (e) => (
-                          e.readTable<$AppSettingsTable, AppSetting>(table),
-                          BaseReferences<
-                            _$AppDatabase,
-                            $AppSettingsTable,
-                            AppSetting
-                          >(db, table, e),
+                          e.readTable(table),
+                          BaseReferences(db, table, e),
                         ),
                       )
                       .toList(),
@@ -9247,6 +8723,10 @@ class $AppDatabaseManager {
   $AppDatabaseManager(this._db);
   $$NodesTableTableManager get nodes =>
       $$NodesTableTableManager(_db, _db.nodes);
+  $$ProfilesTableTableManager get profiles =>
+      $$ProfilesTableTableManager(_db, _db.profiles);
+  $$CategoriesTableTableManager get categories =>
+      $$CategoriesTableTableManager(_db, _db.categories);
   $$LinksTableTableManager get links =>
       $$LinksTableTableManager(_db, _db.links);
   $$NotesTableTableManager get notes =>
@@ -9269,6 +8749,8 @@ class $AppDatabaseManager {
 
 mixin _$NodesDaoMixin on DatabaseAccessor<AppDatabase> {
   $NodesTable get nodes => attachedDatabase.nodes;
+  $ProfilesTable get profiles => attachedDatabase.profiles;
+  $CategoriesTable get categories => attachedDatabase.categories;
   $LinksTable get links => attachedDatabase.links;
   $NotesTable get notes => attachedDatabase.notes;
   $EmailsTable get emails => attachedDatabase.emails;
@@ -9285,6 +8767,10 @@ class NodesDaoManager {
   NodesDaoManager(this._db);
   $$NodesTableTableManager get nodes =>
       $$NodesTableTableManager(_db.attachedDatabase, _db.nodes);
+  $$ProfilesTableTableManager get profiles =>
+      $$ProfilesTableTableManager(_db.attachedDatabase, _db.profiles);
+  $$CategoriesTableTableManager get categories =>
+      $$CategoriesTableTableManager(_db.attachedDatabase, _db.categories);
   $$LinksTableTableManager get links =>
       $$LinksTableTableManager(_db.attachedDatabase, _db.links);
   $$NotesTableTableManager get notes =>
@@ -9304,7 +8790,6 @@ class NodesDaoManager {
 }
 
 mixin _$ElementsDaoMixin on DatabaseAccessor<AppDatabase> {
-  $NodesTable get nodes => attachedDatabase.nodes;
   $LinksTable get links => attachedDatabase.links;
   $NotesTable get notes => attachedDatabase.notes;
   $EmailsTable get emails => attachedDatabase.emails;
@@ -9318,8 +8803,6 @@ mixin _$ElementsDaoMixin on DatabaseAccessor<AppDatabase> {
 class ElementsDaoManager {
   final _$ElementsDaoMixin _db;
   ElementsDaoManager(this._db);
-  $$NodesTableTableManager get nodes =>
-      $$NodesTableTableManager(_db.attachedDatabase, _db.nodes);
   $$LinksTableTableManager get links =>
       $$LinksTableTableManager(_db.attachedDatabase, _db.links);
   $$NotesTableTableManager get notes =>
@@ -9338,6 +8821,7 @@ class ElementsDaoManager {
 
 mixin _$BackupDaoMixin on DatabaseAccessor<AppDatabase> {
   $NodesTable get nodes => attachedDatabase.nodes;
+  $CategoriesTable get categories => attachedDatabase.categories;
   $LinksTable get links => attachedDatabase.links;
   $NotesTable get notes => attachedDatabase.notes;
   $EmailsTable get emails => attachedDatabase.emails;
@@ -9354,6 +8838,8 @@ class BackupDaoManager {
   BackupDaoManager(this._db);
   $$NodesTableTableManager get nodes =>
       $$NodesTableTableManager(_db.attachedDatabase, _db.nodes);
+  $$CategoriesTableTableManager get categories =>
+      $$CategoriesTableTableManager(_db.attachedDatabase, _db.categories);
   $$LinksTableTableManager get links =>
       $$LinksTableTableManager(_db.attachedDatabase, _db.links);
   $$NotesTableTableManager get notes =>

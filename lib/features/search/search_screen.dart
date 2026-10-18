@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/enums.dart';
 import '../../data/db/app_database.dart';
+import '../../providers/profile_providers.dart';
 import '../../providers/settings_providers.dart';
 import '../../providers/tree_providers.dart';
 import '../../shared/widgets/common.dart';
@@ -28,6 +29,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   int? _sectionId;
   NodeType? _type;
   NodeStatus? _status;
+  int? _categoryId; // v2.0 (D-023) — optional category filter
 
   /// v1.23 — sort menu for results (persisted, shared with browser).
   Widget _sortMenu(AppLocalizations l10n, NodeSort sort) =>
@@ -62,6 +64,11 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final l10n = AppLocalizations.of(context)!;
     final tree = ref.watch(treeProvider).value ?? const TreeState([]);
 
+    // v2.0 (D-023) — category filter dropdown data for the current profile.
+    final profileId = ref.watch(currentProfileIdProvider);
+    final categories =
+        ref.watch(categoriesProvider(profileId)).value ?? const <CategoryRow>[];
+
     final tabs = tree.nodes.where((n) => n.type == NodeType.mainTab).toList()
       ..sort((a, b) => a.sortIndex.compareTo(b.sortIndex));
     final subs = tree.nodes.where((n) => n.parentId == _tabId).toList();
@@ -76,6 +83,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         sectionId: _sectionId,
         type: _type,
         status: _status,
+        categoryId: _categoryId,
       ),
       sort,
     );
@@ -185,6 +193,24 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     }
                     _sectionId = v;
                   }),
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<int>(
+                  // v2.0 (D-023) — filter by catalog entry.
+                  initialValue: _categoryId,
+                  isExpanded: true,
+                  decoration: InputDecoration(labelText: l10n.filterCategory),
+                  items: [
+                    DropdownMenuItem<int>(
+                        value: null, child: Text(l10n.allCategories)),
+                    for (final c in categories)
+                      DropdownMenuItem(
+                        value: c.id,
+                        child: Text(categoryDisplayName(l10n, c),
+                            overflow: TextOverflow.ellipsis),
+                      ),
+                  ],
+                  onChanged: (v) => setState(() => _categoryId = v),
                 ),
                 const SizedBox(height: 10),
                 Row(children: [

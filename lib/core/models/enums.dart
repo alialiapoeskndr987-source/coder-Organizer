@@ -1,5 +1,7 @@
 /// Domain enums shared across layers (UI imports without Drift dependency).
-enum NodeType { mainTab, subTab, section, project }
+/// v2.0 (D-027) — `item` completes the free tree: projects (and items
+/// themselves) may nest arbitrary item children at any depth.
+enum NodeType { mainTab, subTab, section, project, item }
 
 enum NodeTemplate { client, personal, subscription, quickNote, custom }
 

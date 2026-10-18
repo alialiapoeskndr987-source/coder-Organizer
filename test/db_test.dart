@@ -20,11 +20,11 @@ void main() {
 
   test('hierarchy: subtree soft-delete + instant undo (D-010)', () async {
     final tab = await db.nodesDao
-        .addNode(NodesCompanion.insert(name: 'Tab', type: NodeType.mainTab));
+        .addNode(NodesCompanion.insert(name: 'Tab', type: NodeType.mainTab, profileId: const Value(1)));
     final sub = await db.nodesDao.addNode(NodesCompanion.insert(
-        name: 'Sub', type: NodeType.subTab, parentId: Value(tab)));
+        name: 'Sub', type: NodeType.subTab, parentId: Value(tab), profileId: const Value(1)));
     final proj = await db.nodesDao.addNode(NodesCompanion.insert(
-        name: 'Proj', type: NodeType.project, parentId: Value(sub)));
+        name: 'Proj', type: NodeType.project, parentId: Value(sub), profileId: const Value(1)));
     await db.elementsDao.addLink(LinksCompanion.insert(
         nodeId: proj,
         title: 'Repo',
@@ -34,17 +34,17 @@ void main() {
     final snapshot = await db.nodesDao.softDeleteSubtree(tab);
     expect(snapshot.nodeIds.length, 3);
     expect((await db.nodesDao.trashedNodes()).length, 3);
-    expect((await db.nodesDao.watchNodes().first).isEmpty, isTrue);
+    expect((await db.nodesDao.watchNodes(profileId: 1).first).isEmpty, isTrue);
 
     await db.nodesDao.restoreSubtree(snapshot.nodeIds);
-    final alive = await db.nodesDao.watchNodes().first;
+    final alive = await db.nodesDao.watchNodes(profileId: 1).first;
     expect(alive.length, 3);
     expect((await db.elementsDao.watchLinks(proj).first).length, 1);
   });
 
   test('notes limit: exactly 50 per node accepted (D-007)', () async {
     final tab = await db.nodesDao
-        .addNode(NodesCompanion.insert(name: 'T', type: NodeType.mainTab));
+        .addNode(NodesCompanion.insert(name: 'T', type: NodeType.mainTab, profileId: const Value(1)));
     for (var i = 0; i < 50; i++) {
       await db.elementsDao.addNote(NotesCompanion.insert(
           nodeId: tab, title: const Value(null), content: Value('note $i')));
@@ -54,7 +54,7 @@ void main() {
 
   test('export strips secrets (NFR-02)', () async {
     final tab = await db.nodesDao
-        .addNode(NodesCompanion.insert(name: 'T', type: NodeType.mainTab));
+        .addNode(NodesCompanion.insert(name: 'T', type: NodeType.mainTab, profileId: const Value(1)));
     await db.elementsDao.addEmail(EmailsCompanion.insert(
         nodeId: tab,
         label: 'client mail',
@@ -92,7 +92,7 @@ void main() {
     };
     await db.backupDao.importJson(data, ImportStrategy.merge);
 
-    final nodes = await db.nodesDao.watchNodes().first;
+    final nodes = await db.nodesDao.watchNodes(profileId: 1).first;
     expect(nodes.length, 2);
     final parent = nodes.firstWhere((n) => n.name == 'Parent');
     final child = nodes.firstWhere((n) => n.name == 'Child');
@@ -101,9 +101,9 @@ void main() {
 
   test('trash purge removes only past retention (D-010)', () async {
     final a = await db.nodesDao
-        .addNode(NodesCompanion.insert(name: 'Old', type: NodeType.mainTab));
+        .addNode(NodesCompanion.insert(name: 'Old', type: NodeType.mainTab, profileId: const Value(1)));
     final b = await db.nodesDao
-        .addNode(NodesCompanion.insert(name: 'New', type: NodeType.mainTab));
+        .addNode(NodesCompanion.insert(name: 'New', type: NodeType.mainTab, profileId: const Value(1)));
     // simulate old deletion
     await (db.update(db.nodes)..where((n) => n.id.equals(a))).write(
         NodesCompanion(

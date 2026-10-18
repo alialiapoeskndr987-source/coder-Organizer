@@ -2,6 +2,8 @@ part of '../app_database.dart';
 
 @DriftAccessor(tables: [
   Nodes,
+  Profiles,
+  Categories,
   Links,
   Notes,
   Emails,
@@ -14,14 +16,27 @@ part of '../app_database.dart';
 class NodesDao extends DatabaseAccessor<AppDatabase> with _$NodesDaoMixin {
   NodesDao(super.db);
 
-  Stream<List<Node>> watchNodes({bool includeDeleted = false}) {
+  /// v2.0 — nodes are scoped to the current profile (D-021).
+  Stream<List<Node>> watchNodes({required int profileId,
+      bool includeDeleted = false}) {
     final q = select(nodes);
+    q.where((n) => n.profileId.equals(profileId));
     if (!includeDeleted) q.where((n) => n.deletedAt.isNull());
     q.orderBy([
       (n) => OrderingTerm.asc(n.sortIndex),
       (n) => OrderingTerm.asc(n.id),
     ]);
     return q.watch();
+  }
+
+  /// v2.0 (D-026) — active (non-deleted) project count for a profile.
+  Future<int> countProjects(int profileId) async {
+    final rows = await (select(nodes)
+          ..where((n) => n.profileId.equals(profileId) &
+              n.type.equalsValue(NodeType.project) &
+              n.deletedAt.isNull()))
+        .get();
+    return rows.length;
   }
 
   Future<Node?> getNode(int id) =>

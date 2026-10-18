@@ -11,6 +11,7 @@ import '../../providers/core_providers.dart';
 import '../../providers/tree_providers.dart';
 import '../../shared/widgets/common.dart';
 import '../../shared/widgets/icon_registry.dart';
+import '../tree/tree_browser_screen.dart';
 import 'node_element_dialogs.dart';
 
 /// Node details (FR-06): links, notes (≤50, D-007), alerts, registered
@@ -37,6 +38,16 @@ class NodeDetailsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(node.name),
         actions: [
+          // v2.0 (D-027) — free tree: drill into this node's children.
+          if (tree!.childrenOf(node.id).isNotEmpty)
+            IconButton(
+              tooltip: l10n.openTree,
+              icon: const Icon(Icons.account_tree_outlined),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (_) => TreeBrowserScreen(nodeId: node.id)),
+              ),
+            ),
           IconButton(
             tooltip: l10n.changeIcon,
             icon: Icon(iconFor(node.icon)),
