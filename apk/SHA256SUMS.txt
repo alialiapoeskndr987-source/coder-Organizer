@@ -1,0 +1,2 @@
+695bbb4309d22ab5bedeb62094d34e418fa12030a313bc91551108348e3dfda1  coder-organizer-v1.23-full-universal.apk
+2691f6990e6664fd0c6e07c82c95f3e583b8756d98c247c233e998b8aa4ad2fe  coder-organizer-v1.23-lite-arm64.apk
