@@ -49,13 +49,13 @@ android {
     productFlavors {
         create("stable") {
             dimension = "channel"
-            resValue("string", "app_name", "Coder Organizer")
+            manifestPlaceholders["appName"] = "Coder Organizer"
         }
         create("lite") {
             dimension = "channel"
             applicationIdSuffix = ".lite"
             versionNameSuffix = "-lite"
-            resValue("string", "app_name", "Coder Organizer Lite")
+            manifestPlaceholders["appName"] = "Coder Organizer Lite"
             packaging {
                 jniLibs {
                     useLegacyPackaging = true
