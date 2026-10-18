@@ -38,3 +38,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   generate: true
+
+# إصلاح بناء APK: path_provider_android 2.3.x أُدخل فيه كود JNI أصلي (jni/cmake)
+# يفرض تنزيل NDK وفشل البناء في بيئات محدودة. 2.2.23 آخر إصدار خالص (Kotlin فقط)
+# ومتوافق كلياً مع path_provider 2.1.5.
+dependency_overrides:
+  path_provider_android: 2.2.23

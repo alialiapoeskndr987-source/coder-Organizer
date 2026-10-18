@@ -7,7 +7,9 @@ plugins {
 android {
     namespace = "com.coderorganizer.coder_organizer"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    // ndkVersion = flutter.ndkVersion — حُذف عمداً: لا كود C/C++ في المشروع
+    // (path_provider_android مقفول على 2.2.23 الخالص عبر dependency_overrides)،
+    // وإفراد NDK يبطئ البناء ويستهلك مساحة بلا داعٍ.
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

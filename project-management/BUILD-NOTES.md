@@ -96,3 +96,22 @@ keytool -genkey -v -keystore ~/coder-organizer-upload.jks -keyalg RSA -keysize 2
 - التنبيهات تُعاد جدولتها تلقائياً عند فتح التطبيق/الاستيراد/الاسترجاع؛ إشعارات ما بعد إعادة تشغيل الهاتف تُعاد عند أول فتح (إضافة مستقبِل Boot محتملة لاحقاً).
 - دمج الاستيراد يضيف نسخة جديدة بمعرّفات معاد ربطها (لا يحاول الإصلاح بالمعرّف) — سلوك موثّق ومقصود.
 - الأيقونة الافتراضية Flutter مستخدمة مؤقتاً — الهوية البصرية بند Q11 المتبقي قبل النشر.
+
+## 8. البناء السحابي بدون حاسوب (GitHub Actions) — سجل الإصلاح
+
+**السياق:** بيئة البناء المعتمدة هي بيئة العمل (D-019)، وأُضيف مسار سحابي موازٍ يبني APK تلقائياً عند كل push إلى main دون حاجة لأي حاسوب محلي.
+
+**سجل مشاكل البناء وحلولها (للمرجعية):**
+
+| # | المشكلة | الحل المعتمد |
+|---|---------|--------------|
+| 1 | `path_provider_android` 2.3.x أُدخل فيه كود JNI أصلي (jni/cmake) يفرض تنزيل NDK وفشل البناء في البيئات المحدودة | قفل الإصدار الخالص `2.2.23` عبر `dependency_overrides` في pubspec.yaml (آخر إصدار Kotlin فقط، متوافق مع path_provider 2.1.5) |
+| 2 | Flutter 3.47 + AGP 9.1 يفرضان NDK لإزالة رموز التنقيح حتى بلا كود C | حذف `ndkVersion = flutter.ndkVersion` من `android/app/build.gradle.kts` (لا NDK إطلاقاً بعد إصلاح #1) |
+| 3 | `gradlew` و`gradlew.bat` و`gradle-wrapper.jar` مستبعدة من المستودع بـ android/.gitignore الافتراضي | خطوة "Restore Gradle wrapper" في الـ workflow تولّدها بـ Gradle 9.3.1 المطابق لـ gradle-wrapper.properties |
+
+**مسار CI (`.github/workflows/build-apk.yml`):**
+- JDK 21 (Temurin) + Flutter 3.47.6 stable + استعادة الـ wrapper 9.3.1
+- `flutter pub get` ثم `flutter analyze` (يجب أن يكون نظيفاً) ثم `flutter test` (يجب أن تنجح كلها) ثم بناء APK شامل (كل المعماريات) + APK arm64 مجزأ
+- المخرجات تُرفع كـ artifact باسم `coder-organizer-apks` يحوي: `coder-organizer-v1.22-release.apk` (شامل) + `coder-organizer-v1.22-arm64.apk` + `SHA256SUMS.txt`
+
+**توقيع APK المبني في CI:** توقيع debug (سلوك قالب Flutter الافتراضي) — يكفي للتثبيت التجريبي المباشر على الجهاز؛ يُعاد التوقيع بمفتاح النشر قبل رفع App Bundle إلى Play (§6).
