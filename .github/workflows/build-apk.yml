@@ -45,6 +45,8 @@ jobs:
           curl -fsSL -o gradle.zip https://services.gradle.org/distributions/gradle-9.3.1-bin.zip
           unzip -q gradle.zip
           mkdir wrapper-gen && cd wrapper-gen
+          # Gradle 9 يتطلب ملف settings حتى لمهمة wrapper في مجلد فارغ
+          touch settings.gradle.kts
           "$RUNNER_TEMP/gradle-9.3.1/bin/gradle" wrapper --gradle-version 9.3.1 --distribution-type all
           cp gradlew gradlew.bat "$GITHUB_WORKSPACE/android/"
           cp gradle/wrapper/gradle-wrapper.jar "$GITHUB_WORKSPACE/android/gradle/wrapper/"
