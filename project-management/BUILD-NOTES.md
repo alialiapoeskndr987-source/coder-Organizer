@@ -139,3 +139,20 @@ keytool -genkey -v -keystore ~/coder-organizer-upload.jks -keyalg RSA -keysize 2
 6. إن فشلت Lite: جرّب Full Universal (حزمة مختلفة تماماً) وأبلغ برسالة الخطأ الحرفية
 
 **جديد v1.23 (طلب المالك):** فرز مستدام (يدوي/اسم/أحدث/أقدم) للاستعراض والبحث، فلترة حالة في الشجرة، إحصاءات نظرة عامة في الرئيسية، شبكة مضغوطة اختيارية، قسم التنظيم والعرض بالإعدادات — بلا تغيير مخطط قاعدة (settings KV فقط).
+
+## 10. v2.0 (دفعة واحدة) — الملفات الشخصية والأمان المحلي والتنظيم (versionCode 25)
+
+| البند | القيمة |
+|---|---|
+| نكهتا التوزيع | `stable` شاملة (3 معماريات، ~32MB) + `lite` arm64 (~12MB) — كما في v1.23/v1.24 |
+| versionCode/Name | 25 / "2.0" — **يُضبط في `android/app/build.gradle.kts` وليس pubspec فقط** (مصدر تسمية CI هو gradle) |
+| schema قاعدة البيانات | v1 → **v2**: `profiles` + `categories` + عمودا `profile_id`/`category_id` على `nodes`؛ ترحيل آمن: بيانات المستخدم الحالي تنتقل إلى الملف #1 |
+| ترجمة CI | الإصدار يُقرأ من gradle بسطرين `versionName/versionCode` — عدّلهما مع كل إصدار |
+| الأمان | PBKDF2-SHA256 (40k دورة) في Keystore + TOTP محلي + FLAG_SECURE عبر قناة MainActivity |
+| تبعيات جديدة | `crypto ^3.0.6` + `qr_flutter ^4.1.0` (كلاهما pure Dart — بلا أثر على البناء الأصلي) |
+
+### قائمة فحص الإصدار (كررها مع كل إصدار)
+1. `pubspec.yaml` → `version: X.Y.Z+N`
+2. `android/app/build.gradle.kts` → `versionCode = N` و`versionName = "X.Y"`
+3. `lib/core/constants/app_constants.dart` → `appVersion = 'X.Y'`
+4. push → انتظار CI الأخضر → تحميل artifact → التحقق من اسم الملف v X.Y → استبدال `apk/` → Release + tag
