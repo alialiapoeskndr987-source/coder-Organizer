@@ -3,6 +3,11 @@ name: Build APK
 on:
   push:
     branches: [main]
+    # لا بناء للدفعات التوثيقية أو تحديثات مجلد apk
+    paths-ignore:
+      - 'apk/**'
+      - 'project-management/**'
+      - '**.md'
   workflow_dispatch:
 
 concurrency:
